@@ -26,6 +26,9 @@ public class UserService {
     @Autowired
     UserMapper userMapper;
 
+//    @Autowired
+
+
     public User createUser(UserCreationRequest request) {
         if(userRepostitory.existsByUsername(request.getUsername())) {
             throw new AppException(ErrorCode.USER_EXISTED);
