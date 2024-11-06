@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <style>
+      * {
+        font-family: Arial, Helvetica, sans-serif;
+      }
+      h1 {
+        text-align: center;
+      }
+      .group-header th {
+        font-size: 200%;
+      }
+      .sub-header th {
+        font-size: 150%;
+      }
+      table, th, td {
+        border: 1px solid black;
+        border-collapse: collapse;
+        white-space: nowrap;
+        padding: .3em;
+      }
+      table {
+        margin: 0 auto;
+      }
+      .severity {
+        text-align: center;
+        font-weight: bold;
+        color: #fafafa;
+      }
+      .severity-LOW .severity { background-color: #5fbb31; }
+      .severity-MEDIUM .severity { background-color: #e9c600; }
+      .severity-HIGH .severity { background-color: #ff8800; }
+      .severity-CRITICAL .severity { background-color: #e40000; }
+      .severity-UNKNOWN .severity { background-color: #747474; }
+      .severity-LOW { background-color: #5fbb3160; }
+      .severity-MEDIUM { background-color: #e9c60060; }
+      .severity-HIGH { background-color: #ff880060; }
+      .severity-CRITICAL { background-color: #e4000060; }
+      .severity-UNKNOWN { background-color: #74747460; }
+      table tr td:first-of-type {
+        font-weight: bold;
+      }
+      .links a,
+      .links[data-more-links=on] a {
+        display: block;
+      }
+      .links[data-more-links=off] a:nth-of-type(1n+5) {
+        display: none;
+      }
+      a.toggle-more-links { cursor: pointer; }
+    </style>
+    <title>slayder2709/api-gateway:v1 (amazon 2 (Karoo)) - Trivy Report - 2024-11-06 18:37:09.764266726 +0000 UTC m=+125.552622143 </title>
+    <script>
+      window.onload = function() {
+        document.querySelectorAll('td.links').forEach(function(linkCell) {
+          var links = [].concat.apply([], linkCell.querySelectorAll('a'));
+          [].sort.apply(links, function(a, b) {
+            return a.href > b.href ? 1 : -1;
+          });
+          links.forEach(function(link, idx) {
+            if (links.length > 3 && 3 === idx) {
+              var toggleLink = document.createElement('a');
+              toggleLink.innerText = "Toggle more links";
+              toggleLink.href = "#toggleMore";
+              toggleLink.setAttribute("class", "toggle-more-links");
+              linkCell.appendChild(toggleLink);
+            }
+            linkCell.appendChild(link);
+          });
+        });
+        document.querySelectorAll('a.toggle-more-links').forEach(function(toggleLink) {
+          toggleLink.onclick = function() {
+            var expanded = toggleLink.parentElement.getAttribute("data-more-links");
+            toggleLink.parentElement.setAttribute("data-more-links", "on" === expanded ? "off" : "on");
+            return false;
+          };
+        });
+      };
+    </script>
+  </head>
+  <body>
+    <h1>slayder2709/api-gateway:v1 (amazon 2 (Karoo)) - Trivy Report - 2024-11-06 18:37:09.764308865 +0000 UTC m=+125.552664262</h1>
+    <table>
+      <tr class="group-header"><th colspan="6">amazon</th></tr>
+      <tr class="sub-header">
+        <th>Package</th>
+        <th>Vulnerability ID</th>
+        <th>Severity</th>
+        <th>Installed Version</th>
+        <th>Fixed Version</th>
+        <th>Links</th>
+      </tr>
+      <tr class="severity-MEDIUM">
+        <td class="pkg-name">python</td>
+        <td>CVE-2023-27043</td>
+        <td class="severity">MEDIUM</td>
+        <td class="pkg-version">2.7.18-1.amzn2.0.8</td>
+        <td>2.7.18-1.amzn2.0.9</td>
+        <td class="links" data-more-links="off">
+          <a href="http://python.org">http://python.org</a>
+          <a href="https://access.redhat.com/articles/7051467">https://access.redhat.com/articles/7051467</a>
+          <a href="https://access.redhat.com/errata/RHSA-2024:2292">https://access.redhat.com/errata/RHSA-2024:2292</a>
+          <a href="https://access.redhat.com/security/cve/CVE-2023-27043">https://access.redhat.com/security/cve/CVE-2023-27043</a>
+          <a href="https://bugzilla.redhat.com/2196183">https://bugzilla.redhat.com/2196183</a>
+          <a href="https://bugzilla.redhat.com/show_bug.cgi?id=2196183">https://bugzilla.redhat.com/show_bug.cgi?id=2196183</a>
+          <a href="https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2023-27043">https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2023-27043</a>
+          <a href="https://errata.almalinux.org/9/ALSA-2024-2292.html">https://errata.almalinux.org/9/ALSA-2024-2292.html</a>
+          <a href="https://errata.rockylinux.org/RLSA-2024:0256">https://errata.rockylinux.org/RLSA-2024:0256</a>
+          <a href="https://github.com/python/cpython/issues/102988">https://github.com/python/cpython/issues/102988</a>
+          <a href="https://github.com/python/cpython/pull/102990">https://github.com/python/cpython/pull/102990</a>
+          <a href="https://github.com/python/cpython/pull/105127">https://github.com/python/cpython/pull/105127</a>
+          <a href="https://linux.oracle.com/cve/CVE-2023-27043.html">https://linux.oracle.com/cve/CVE-2023-27043.html</a>
+          <a href="https://linux.oracle.com/errata/ELSA-2024-3062.html">https://linux.oracle.com/errata/ELSA-2024-3062.html</a>
+          <a href="https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/4ZAEFSFZDNBNJPNOUTLG5COISGQDLMGV/">https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/4ZAEFSFZDNBNJPNOUTLG5COISGQDLMGV/</a>
+          <a href="https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/75DTHSTNOFFNAWHXKMDXS7EJWC6W2FUC/">https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/75DTHSTNOFFNAWHXKMDXS7EJWC6W2FUC/</a>
+          <a href="https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/ARI7VDSNTQVXRQFM6IK5GSSLEIYV4VZH/">https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/ARI7VDSNTQVXRQFM6IK5GSSLEIYV4VZH/</a>
+          <a href="https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/BQAKLUJMHFGVBRDPEY57BJGNCE5UUPHW/">https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/BQAKLUJMHFGVBRDPEY57BJGNCE5UUPHW/</a>
+          <a href="https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/HXYVPEZUA3465AEFX5JVFVP7KIFZMF3N/">https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/HXYVPEZUA3465AEFX5JVFVP7KIFZMF3N/</a>
+          <a href="https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/N6M5I6OQHJABNEYY555HUMMKX3Y4P25Z/">https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/N6M5I6OQHJABNEYY555HUMMKX3Y4P25Z/</a>
+          <a href="https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/NEUNZSZ3CVSM2QWVYH3N2XGOCDWNYUA3/">https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/NEUNZSZ3CVSM2QWVYH3N2XGOCDWNYUA3/</a>
+          <a href="https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/ORLXS5YTKN65E2Q2NWKXMFS5FWQHRNZW/">https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/ORLXS5YTKN65E2Q2NWKXMFS5FWQHRNZW/</a>
+          <a href="https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/P2MAICLFDDO3QVNHTZ2OCERZQ34R2PIC/">https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/P2MAICLFDDO3QVNHTZ2OCERZQ34R2PIC/</a>
+          <a href="https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/P2W2BZQIHMCKRI5FNBJERFYMS5PK6TAH/">https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/P2W2BZQIHMCKRI5FNBJERFYMS5PK6TAH/</a>
+          <a href="https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/PHVGRKQAGANCSGFI3QMYOCIMS4IFOZA5/">https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/PHVGRKQAGANCSGFI3QMYOCIMS4IFOZA5/</a>
+          <a href="https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/PU6Y2S5CBN5BWCBDAJFTGIBZLK3S2G3J/">https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/PU6Y2S5CBN5BWCBDAJFTGIBZLK3S2G3J/</a>
+          <a href="https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/QDRDDPDN3VFIYXJIYEABY6USX5EU66AG/">https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/QDRDDPDN3VFIYXJIYEABY6USX5EU66AG/</a>
+          <a href="https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/RDDC2VOX7OQC6OHMYTVD4HLFZIV6PYBC/">https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/RDDC2VOX7OQC6OHMYTVD4HLFZIV6PYBC/</a>
+          <a href="https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/SINP4OVYNB2AGDYI2GS37EMW3H3F7XPZ/">https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/SINP4OVYNB2AGDYI2GS37EMW3H3F7XPZ/</a>
+          <a href="https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/SOX7BCN6YL7B3RFPEEXPIU5CMTEHJOKR/">https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/SOX7BCN6YL7B3RFPEEXPIU5CMTEHJOKR/</a>
+          <a href="https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/VZXC32CJ7TWDPJO6GY2XIQRO7JZX5FLP/">https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/VZXC32CJ7TWDPJO6GY2XIQRO7JZX5FLP/</a>
+          <a href="https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/XWMBD4LNHWEXRI6YVFWJMTJQUL5WOFTS/">https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/XWMBD4LNHWEXRI6YVFWJMTJQUL5WOFTS/</a>
+          <a href="https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/YQVY5C5REXWJIORJIL2FIL3ALOEJEF72/">https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/YQVY5C5REXWJIORJIL2FIL3ALOEJEF72/</a>
+          <a href="https://nvd.nist.gov/vuln/detail/CVE-2023-27043">https://nvd.nist.gov/vuln/detail/CVE-2023-27043</a>
+          <a href="https://python-security.readthedocs.io/vuln/email-parseaddr-realname.html">https://python-security.readthedocs.io/vuln/email-parseaddr-realname.html</a>
+          <a href="https://security.netapp.com/advisory/ntap-20230601-0003/">https://security.netapp.com/advisory/ntap-20230601-0003/</a>
+          <a href="https://ubuntu.com/security/notices/USN-7015-1">https://ubuntu.com/security/notices/USN-7015-1</a>
+          <a href="https://ubuntu.com/security/notices/USN-7015-3">https://ubuntu.com/security/notices/USN-7015-3</a>
+          <a href="https://ubuntu.com/security/notices/USN-7015-4">https://ubuntu.com/security/notices/USN-7015-4</a>
+          <a href="https://www.cve.org/CVERecord?id=CVE-2023-27043">https://www.cve.org/CVERecord?id=CVE-2023-27043</a>
+        </td>
+      </tr>
+      <tr class="severity-MEDIUM">
+        <td class="pkg-name">python-libs</td>
+        <td>CVE-2023-27043</td>
+        <td class="severity">MEDIUM</td>
+        <td class="pkg-version">2.7.18-1.amzn2.0.8</td>
+        <td>2.7.18-1.amzn2.0.9</td>
+        <td class="links" data-more-links="off">
+          <a href="http://python.org">http://python.org</a>
+          <a href="https://access.redhat.com/articles/7051467">https://access.redhat.com/articles/7051467</a>
+          <a href="https://access.redhat.com/errata/RHSA-2024:2292">https://access.redhat.com/errata/RHSA-2024:2292</a>
+          <a href="https://access.redhat.com/security/cve/CVE-2023-27043">https://access.redhat.com/security/cve/CVE-2023-27043</a>
+          <a href="https://bugzilla.redhat.com/2196183">https://bugzilla.redhat.com/2196183</a>
+          <a href="https://bugzilla.redhat.com/show_bug.cgi?id=2196183">https://bugzilla.redhat.com/show_bug.cgi?id=2196183</a>
+          <a href="https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2023-27043">https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2023-27043</a>
+          <a href="https://errata.almalinux.org/9/ALSA-2024-2292.html">https://errata.almalinux.org/9/ALSA-2024-2292.html</a>
+          <a href="https://errata.rockylinux.org/RLSA-2024:0256">https://errata.rockylinux.org/RLSA-2024:0256</a>
+          <a href="https://github.com/python/cpython/issues/102988">https://github.com/python/cpython/issues/102988</a>
+          <a href="https://github.com/python/cpython/pull/102990">https://github.com/python/cpython/pull/102990</a>
+          <a href="https://github.com/python/cpython/pull/105127">https://github.com/python/cpython/pull/105127</a>
+          <a href="https://linux.oracle.com/cve/CVE-2023-27043.html">https://linux.oracle.com/cve/CVE-2023-27043.html</a>
+          <a href="https://linux.oracle.com/errata/ELSA-2024-3062.html">https://linux.oracle.com/errata/ELSA-2024-3062.html</a>
+          <a href="https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/4ZAEFSFZDNBNJPNOUTLG5COISGQDLMGV/">https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/4ZAEFSFZDNBNJPNOUTLG5COISGQDLMGV/</a>
+          <a href="https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/75DTHSTNOFFNAWHXKMDXS7EJWC6W2FUC/">https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/75DTHSTNOFFNAWHXKMDXS7EJWC6W2FUC/</a>
+          <a href="https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/ARI7VDSNTQVXRQFM6IK5GSSLEIYV4VZH/">https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/ARI7VDSNTQVXRQFM6IK5GSSLEIYV4VZH/</a>
+          <a href="https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/BQAKLUJMHFGVBRDPEY57BJGNCE5UUPHW/">https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/BQAKLUJMHFGVBRDPEY57BJGNCE5UUPHW/</a>
+          <a href="https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/HXYVPEZUA3465AEFX5JVFVP7KIFZMF3N/">https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/HXYVPEZUA3465AEFX5JVFVP7KIFZMF3N/</a>
+          <a href="https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/N6M5I6OQHJABNEYY555HUMMKX3Y4P25Z/">https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/N6M5I6OQHJABNEYY555HUMMKX3Y4P25Z/</a>
+          <a href="https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/NEUNZSZ3CVSM2QWVYH3N2XGOCDWNYUA3/">https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/NEUNZSZ3CVSM2QWVYH3N2XGOCDWNYUA3/</a>
+          <a href="https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/ORLXS5YTKN65E2Q2NWKXMFS5FWQHRNZW/">https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/ORLXS5YTKN65E2Q2NWKXMFS5FWQHRNZW/</a>
+          <a href="https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/P2MAICLFDDO3QVNHTZ2OCERZQ34R2PIC/">https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/P2MAICLFDDO3QVNHTZ2OCERZQ34R2PIC/</a>
+          <a href="https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/P2W2BZQIHMCKRI5FNBJERFYMS5PK6TAH/">https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/P2W2BZQIHMCKRI5FNBJERFYMS5PK6TAH/</a>
+          <a href="https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/PHVGRKQAGANCSGFI3QMYOCIMS4IFOZA5/">https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/PHVGRKQAGANCSGFI3QMYOCIMS4IFOZA5/</a>
+          <a href="https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/PU6Y2S5CBN5BWCBDAJFTGIBZLK3S2G3J/">https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/PU6Y2S5CBN5BWCBDAJFTGIBZLK3S2G3J/</a>
+          <a href="https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/QDRDDPDN3VFIYXJIYEABY6USX5EU66AG/">https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/QDRDDPDN3VFIYXJIYEABY6USX5EU66AG/</a>
+          <a href="https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/RDDC2VOX7OQC6OHMYTVD4HLFZIV6PYBC/">https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/RDDC2VOX7OQC6OHMYTVD4HLFZIV6PYBC/</a>
+          <a href="https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/SINP4OVYNB2AGDYI2GS37EMW3H3F7XPZ/">https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/SINP4OVYNB2AGDYI2GS37EMW3H3F7XPZ/</a>
+          <a href="https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/SOX7BCN6YL7B3RFPEEXPIU5CMTEHJOKR/">https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/SOX7BCN6YL7B3RFPEEXPIU5CMTEHJOKR/</a>
+          <a href="https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/VZXC32CJ7TWDPJO6GY2XIQRO7JZX5FLP/">https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/VZXC32CJ7TWDPJO6GY2XIQRO7JZX5FLP/</a>
+          <a href="https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/XWMBD4LNHWEXRI6YVFWJMTJQUL5WOFTS/">https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/XWMBD4LNHWEXRI6YVFWJMTJQUL5WOFTS/</a>
+          <a href="https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/YQVY5C5REXWJIORJIL2FIL3ALOEJEF72/">https://lists.fedoraproject.org/archives/list/package-announce%40lists.fedoraproject.org/message/YQVY5C5REXWJIORJIL2FIL3ALOEJEF72/</a>
+          <a href="https://nvd.nist.gov/vuln/detail/CVE-2023-27043">https://nvd.nist.gov/vuln/detail/CVE-2023-27043</a>
+          <a href="https://python-security.readthedocs.io/vuln/email-parseaddr-realname.html">https://python-security.readthedocs.io/vuln/email-parseaddr-realname.html</a>
+          <a href="https://security.netapp.com/advisory/ntap-20230601-0003/">https://security.netapp.com/advisory/ntap-20230601-0003/</a>
+          <a href="https://ubuntu.com/security/notices/USN-7015-1">https://ubuntu.com/security/notices/USN-7015-1</a>
+          <a href="https://ubuntu.com/security/notices/USN-7015-3">https://ubuntu.com/security/notices/USN-7015-3</a>
+          <a href="https://ubuntu.com/security/notices/USN-7015-4">https://ubuntu.com/security/notices/USN-7015-4</a>
+          <a href="https://www.cve.org/CVERecord?id=CVE-2023-27043">https://www.cve.org/CVERecord?id=CVE-2023-27043</a>
+        </td>
+      </tr>
+      <tr><th colspan="6">No Misconfigurations found</th></tr>
+      <tr class="group-header"><th colspan="6">jar</th></tr>
+      <tr class="sub-header">
+        <th>Package</th>
+        <th>Vulnerability ID</th>
+        <th>Severity</th>
+        <th>Installed Version</th>
+        <th>Fixed Version</th>
+        <th>Links</th>
+      </tr>
+      <tr class="severity-MEDIUM">
+        <td class="pkg-name">org.bouncycastle:bcprov-jdk18on</td>
+        <td>CVE-2024-29857</td>
+        <td class="severity">MEDIUM</td>
+        <td class="pkg-version">1.77</td>
+        <td>1.78</td>
+        <td class="links" data-more-links="off">
+          <a href="https://access.redhat.com/security/cve/CVE-2024-29857">https://access.redhat.com/security/cve/CVE-2024-29857</a>
+          <a href="https://github.com/bcgit/bc-csharp/commit/56daa6eac526f165416d17f661422d60de0dfd63">https://github.com/bcgit/bc-csharp/commit/56daa6eac526f165416d17f661422d60de0dfd63</a>
+          <a href="https://github.com/bcgit/bc-csharp/wiki/CVE%E2%80%902024%E2%80%9029857">https://github.com/bcgit/bc-csharp/wiki/CVE%E2%80%902024%E2%80%9029857</a>
+          <a href="https://github.com/bcgit/bc-java/commit/efc498ca4caa340ac2fe11f2efee06c1a294501f">https://github.com/bcgit/bc-java/commit/efc498ca4caa340ac2fe11f2efee06c1a294501f</a>
+          <a href="https://github.com/bcgit/bc-java/commit/fee80dd230e7fba132d03a34f1dd1d6aae0d0281">https://github.com/bcgit/bc-java/commit/fee80dd230e7fba132d03a34f1dd1d6aae0d0281</a>
+          <a href="https://github.com/bcgit/bc-java/wiki/CVE%E2%80%902024%E2%80%9029857">https://github.com/bcgit/bc-java/wiki/CVE%E2%80%902024%E2%80%9029857</a>
+          <a href="https://nvd.nist.gov/vuln/detail/CVE-2024-29857">https://nvd.nist.gov/vuln/detail/CVE-2024-29857</a>
+          <a href="https://www.bouncycastle.org/latest_releases.html">https://www.bouncycastle.org/latest_releases.html</a>
+          <a href="https://www.cve.org/CVERecord?id=CVE-2024-29857">https://www.cve.org/CVERecord?id=CVE-2024-29857</a>
+        </td>
+      </tr>
+      <tr class="severity-MEDIUM">
+        <td class="pkg-name">org.bouncycastle:bcprov-jdk18on</td>
+        <td>CVE-2024-30171</td>
+        <td class="severity">MEDIUM</td>
+        <td class="pkg-version">1.77</td>
+        <td>1.78</td>
+        <td class="links" data-more-links="off">
+          <a href="https://access.redhat.com/security/cve/CVE-2024-30171">https://access.redhat.com/security/cve/CVE-2024-30171</a>
+          <a href="https://github.com/bcgit/bc-csharp/commit/c984b8bfd8544dfc55dba91a02cbbbb9c580c217">https://github.com/bcgit/bc-csharp/commit/c984b8bfd8544dfc55dba91a02cbbbb9c580c217</a>
+          <a href="https://github.com/bcgit/bc-csharp/wiki/CVE%E2%80%902024%E2%80%9030171">https://github.com/bcgit/bc-csharp/wiki/CVE%E2%80%902024%E2%80%9030171</a>
+          <a href="https://github.com/bcgit/bc-java/commit/d7d5e735abd64bf0f413f54fd9e495fc02400fb0">https://github.com/bcgit/bc-java/commit/d7d5e735abd64bf0f413f54fd9e495fc02400fb0</a>
+          <a href="https://github.com/bcgit/bc-java/commit/e0569dcb1dea9d421d84fc4c5c5688fe101afa2d">https://github.com/bcgit/bc-java/commit/e0569dcb1dea9d421d84fc4c5c5688fe101afa2d</a>
+          <a href="https://github.com/bcgit/bc-java/wiki/CVE%E2%80%902024%E2%80%9030171">https://github.com/bcgit/bc-java/wiki/CVE%E2%80%902024%E2%80%9030171</a>
+          <a href="https://nvd.nist.gov/vuln/detail/CVE-2024-30171">https://nvd.nist.gov/vuln/detail/CVE-2024-30171</a>
+          <a href="https://people.redhat.com/~hkario/marvin/">https://people.redhat.com/~hkario/marvin/</a>
+          <a href="https://security.netapp.com/advisory/ntap-20240614-0008">https://security.netapp.com/advisory/ntap-20240614-0008</a>
+          <a href="https://security.netapp.com/advisory/ntap-20240614-0008/">https://security.netapp.com/advisory/ntap-20240614-0008/</a>
+          <a href="https://www.bouncycastle.org/latest_releases.html">https://www.bouncycastle.org/latest_releases.html</a>
+          <a href="https://www.cve.org/CVERecord?id=CVE-2024-30171">https://www.cve.org/CVERecord?id=CVE-2024-30171</a>
+        </td>
+      </tr>
+      <tr class="severity-MEDIUM">
+        <td class="pkg-name">org.bouncycastle:bcprov-jdk18on</td>
+        <td>CVE-2024-30172</td>
+        <td class="severity">MEDIUM</td>
+        <td class="pkg-version">1.77</td>
+        <td>1.78</td>
+        <td class="links" data-more-links="off">
+          <a href="https://access.redhat.com/security/cve/CVE-2024-30172">https://access.redhat.com/security/cve/CVE-2024-30172</a>
+          <a href="https://github.com/bcgit/bc-csharp/wiki/CVE%E2%80%902024%E2%80%9030172">https://github.com/bcgit/bc-csharp/wiki/CVE%E2%80%902024%E2%80%9030172</a>
+          <a href="https://github.com/bcgit/bc-java/commit/9c165791b68a204678b48ec11e4e579754c2ea49">https://github.com/bcgit/bc-java/commit/9c165791b68a204678b48ec11e4e579754c2ea49</a>
+          <a href="https://github.com/bcgit/bc-java/commit/ebe1c75579170072dc59b8dee2b55ce31663178f">https://github.com/bcgit/bc-java/commit/ebe1c75579170072dc59b8dee2b55ce31663178f</a>
+          <a href="https://github.com/bcgit/bc-java/wiki/CVE%E2%80%902024%E2%80%9030172">https://github.com/bcgit/bc-java/wiki/CVE%E2%80%902024%E2%80%9030172</a>
+          <a href="https://nvd.nist.gov/vuln/detail/CVE-2024-30172">https://nvd.nist.gov/vuln/detail/CVE-2024-30172</a>
+          <a href="https://security.netapp.com/advisory/ntap-20240614-0007">https://security.netapp.com/advisory/ntap-20240614-0007</a>
+          <a href="https://security.netapp.com/advisory/ntap-20240614-0007/">https://security.netapp.com/advisory/ntap-20240614-0007/</a>
+          <a href="https://www.bouncycastle.org/latest_releases.html">https://www.bouncycastle.org/latest_releases.html</a>
+          <a href="https://www.cve.org/CVERecord?id=CVE-2024-30172">https://www.cve.org/CVERecord?id=CVE-2024-30172</a>
+        </td>
+      </tr>
+      <tr class="severity-LOW">
+        <td class="pkg-name">org.bouncycastle:bcprov-jdk18on</td>
+        <td>CVE-2024-34447</td>
+        <td class="severity">LOW</td>
+        <td class="pkg-version">1.77</td>
+        <td>1.78</td>
+        <td class="links" data-more-links="off">
+          <a href="https://access.redhat.com/security/cve/CVE-2024-34447">https://access.redhat.com/security/cve/CVE-2024-34447</a>
+          <a href="https://github.com/bcgit/bc-java">https://github.com/bcgit/bc-java</a>
+          <a href="https://github.com/bcgit/bc-java/issues/1656">https://github.com/bcgit/bc-java/issues/1656</a>
+          <a href="https://github.com/bcgit/bc-java/wiki/CVE%E2%80%902024%E2%80%9034447">https://github.com/bcgit/bc-java/wiki/CVE%E2%80%902024%E2%80%9034447</a>
+          <a href="https://nvd.nist.gov/vuln/detail/CVE-2024-34447">https://nvd.nist.gov/vuln/detail/CVE-2024-34447</a>
+          <a href="https://security.netapp.com/advisory/ntap-20240614-0007">https://security.netapp.com/advisory/ntap-20240614-0007</a>
+          <a href="https://security.netapp.com/advisory/ntap-20240614-0007/">https://security.netapp.com/advisory/ntap-20240614-0007/</a>
+          <a href="https://www.bouncycastle.org/latest_releases.html">https://www.bouncycastle.org/latest_releases.html</a>
+          <a href="https://www.cve.org/CVERecord?id=CVE-2024-34447">https://www.cve.org/CVERecord?id=CVE-2024-34447</a>
+        </td>
+      </tr>
+      <tr><th colspan="6">No Misconfigurations found</th></tr>
+    </table>
+  </body>
+</html>
