@@ -72,9 +72,8 @@ public class AuthenticationService {
     @Value("${google.clientSecret}")
     protected String CLIENT_SECRET;
 
-    @NonFinal
-    @Value("${google.redirectUri}")
-    protected String REDIRECT_URI;
+
+    private String REDIRECT_URI = "https://movie.nhatanhweb.website/authenticate";
 
     @NonFinal
     protected final String GRANT_TYPE = "authorization_code";
@@ -95,6 +94,12 @@ public class AuthenticationService {
     }
 
     public AuthenticationResponse outboundAuthenticate(String code) {
+        log.info("Login By Google");
+        log.info("code: {}", code);
+        log.info("ClientID: {}", CLIENT_ID);
+        log.info("ClientSecret: {}", CLIENT_SECRET);
+        log.info("GRANT_TYPE: {}", GRANT_TYPE);
+        log.info("REDIRECTED_URL : {}", REDIRECT_URI);
         var response = outboundIdentityClient.exchangeToken(ExchangeTokenRequest.builder()
                 .code(code)
                 .clientId(CLIENT_ID)
@@ -102,7 +107,7 @@ public class AuthenticationService {
                 .redirectUri(REDIRECT_URI)
                 .grantType(GRANT_TYPE)
                 .build());
-
+        log.info("Google Reponse: {}", response);
 
         Set<Role> roles = new HashSet<>();
         roles.add(Role.builder().name(PredefinedRole.USER_ROLE).build());
@@ -112,6 +117,7 @@ public class AuthenticationService {
         if (userRepostitory.existsByEmail(userInfo.getEmail())) {
             isRegister = true;
         }
+        log.info("UserInfo: {}", userInfo);
 
         User user = userRepostitory.findByEmail(userInfo.getEmail()).orElseGet(() -> {
 
@@ -129,6 +135,7 @@ public class AuthenticationService {
                 }
 
         );
+        log.info("User: {}", user);
         NotificationEvent notificationEvent = NotificationEvent.builder()
                 .channel("EMAIL")
                 .recipient(userInfo.getEmail())
@@ -138,7 +145,9 @@ public class AuthenticationService {
         if (!isRegister) {
             kafkaTemplate.send("notification-delivery", notificationEvent);
         }
+        log.info("Send Message Successfully");
         var token = generateToken(user);
+        log.info("Token: {}", token);
         return AuthenticationResponse.builder()
                 .token(token)
                 .authenticated(true)

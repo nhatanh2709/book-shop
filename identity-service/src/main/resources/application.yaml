@@ -27,6 +27,6 @@ app:
     profile: http://localhost:8081/profile
 
 google:
-  clientId: "652210943582-mimqrnmes6ukon9n8jmqcdth4lj61lqf.apps.googleusercontent.com"
-  clientSecret: "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"
+  clientId: "309829967812-k45di4ubndsbv94fft0cjhabgcikca1o.apps.googleusercontent.com"
+  clientSecret: "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"
   redirectUri: "http://localhost:3000/authenticate"

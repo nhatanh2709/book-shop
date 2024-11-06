@@ -35,7 +35,7 @@ services:
       - identity
   identity:
     container_name: identity_service
-    image: slayder2709/identity-service:v1
+    image: slayder2709/identity-service:v3
     ports:
       - "8080:8080"
     environment:
@@ -54,8 +54,8 @@ services:
       - JWT_VALID_DURATION=360000
       - JWT_REFRESHABLE_DURATION=864000
       - APP_SERVICES_PROFILE=http://profile:8081/profile
-      - GOOGLE_CLIENT_ID=652210943582-mimqrnmes6ukon9n8jmqcdth4lj61lqf.apps.googleusercontent.com
-      - GOOGLE_CLIENT_SECRET=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
+      - GOOGLE_CLIENT_ID=309829967812-k45di4ubndsbv94fft0cjhabgcikca1o.apps.googleusercontent.com
+      - GOOGLE_CLIENT_SECRET=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
       - GOOGLE_REDIRECT_URI=http://localhost:3000/authenticate
     networks:
       - movie-web
