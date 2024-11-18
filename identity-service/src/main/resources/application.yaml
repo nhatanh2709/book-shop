@@ -23,10 +23,10 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:8180/realms/movie-web
+          issuer-uri: https://keycloak.website/realms/movie-web
 
 idp:
-  url: http://localhost:8180
+  url: https://keycloak.website
   client-id: Movie_web
   client-secret: J0x148IBCmFNDn94eiomwyNgbNCzBuuS
 
@@ -41,7 +41,7 @@ keycloak:
   adminClientSecret: k93fNyuPIOVWFB1qVSwXnXvM9JMueh9C
   client: Movie_web
   urls:
-    auth: http://localhost:8180
+    auth: https://keycloak.website
 
 
 google:

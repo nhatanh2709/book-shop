@@ -3,12 +3,12 @@ version: '3.8'
 services:
   api-gateway:
     container_name: api-gateway
-    image: api-gateway:v4
+    image: slayder2709/api-gateway:v4
     ports:
       - "8888:8888"
     environment:
       - SPRING_APPLICATION_NAME=api-gateway
-      - APP_SERVICES_IDENTITY=http://identity:8085/identity
+      - APP_SERVICES_IDENTITY=http://identity:8080/identity
       - APP_API_PREFIX=/api/v1
       - APP_HOST_NAME=localhost
       - SPRING_CLOUD_GATEWAY_ROUTES[0]_ID=identity_service
@@ -37,9 +37,9 @@ services:
       - identity
   identity:
     container_name: identity_service
-    image: identity-service:v4
+    image: slayder2709/identity-service:v4
     ports:
-      - "8085:8080"
+      - "8080:8080"
     environment:
       - SERVER_PORT=8080
       - SERVER_SERVLET_CONTEXT_PATH=/identity
@@ -53,15 +53,15 @@ services:
       - SPRING_KAFKA_PRODUCER_KEY_SERIALIZER=org.apache.kafka.common.serialization.StringSerializer
       - SPRING_KAFKA_PRODUCER_VALUE_SERIALIZER=org.springframework.kafka.support.serializer.JsonSerializer
       - JWT_SIGNER_KEY=2QbAyVf+5QAwTjONMGpHAI9pg+43vqXUT43MWqF50Z3lhOvGTzvphfikaeI33/sd
-      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://keycloak:8080/realms/movie-web
-      - IDP_URL=http://keycloak:8080
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=https://keycloak.website/realms/movie-web
+      - IDP_URL=https://keycloak.website
       - IDP_CLIENT_ID=Movie_web
       - IDP_CLIENT_SECRET=J0x148IBCmFNDn94eiomwyNgbNCzBuuS
       - KEYCLOAK_REALM=movie-web
       - KEYCLOAK_ADMIN_CLIENT_ID=admin-cli
       - KEYCLOAK_ADMIN_CLIENT_SECRET=k93fNyuPIOVWFB1qVSwXnXvM9JMueh9C
       - KEYCLOAK_CLIENT=Movie_web
-      - KEYCLOAK_URLS_AUTH=http://keycloak:8080
+      - KEYCLOAK_URLS_AUTH=https://keycloak.website
       - JWT_VALID_DURATION=360000
       - JWT_REFRESHABLE_DURATION=864000
       - APP_SERVICES_PROFILE=http://profile:8081/profile
@@ -74,7 +74,7 @@ services:
       - mysql
   profile:
     container_name: profile_service
-    image: profile-service:v4
+    image: slayder2709/profile-service:v4
     ports:
       - "8081:8081"
     environment:
@@ -85,14 +85,14 @@ services:
       - SPRING_NEO4J_AUTHENTICATION_USERNAME=neo4j
       - SPRING_NEO4J_AUTHENTICATION_PASSWORD=123456789
       - APP_SERVICES_IDENTITY=http://identity:8080/identity
-      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://keycloak:8080/realms/movie-web
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=https://keycloak.website/realms/movie-web
     depends_on:
       - neo4j
       - kafka
     networks:
       - movie-web
   notification:
-    image: notification-service:v4
+    image: slayder2709/notification-service:v4
     container_name: notification-service
     ports:
       - "8082:8082"
@@ -110,12 +110,12 @@ services:
       - SPRING_KAFKA_CONSUMER_KEY_DESERIALIZER=org.apache.kafka.common.serialization.StringDeserializer
       - SPRING_KAFKA_CONSUMER_VALUE_DESERIALIZER=org.springframework.kafka.support.serializer.JsonDeserializer
       - SPRING_KAFKA_CONSUMER_PROPERTIES_SPRING_JSON_TRUSTED_PACKAGES=*
-      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://keycloak:8080/realms/movie-web
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=https://keycloak.website/realms/movie-web
       - NOTIFICATION_EMAIL_BREVO_APIKEY=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
     networks:
       - movie-web
   movie:
-    image: movie-service:v4
+    image: slayder2709/movie-service:v4
     container_name: movie-service
     ports:
       - "8083:8083"
@@ -125,12 +125,12 @@ services:
       - SPRING_APPLICATION_NAME=movie-service
       - SPRING_DATA_MONGODB_URI=mongodb+srv://anh:27092004@backenddb.2qdkr.mongodb.net/?retryWrites=true&w=majority&appName=BackendDB
       - SPRING_DATA_MONGODB_DATABASE=movie-web
-      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://keycloak:8080/realms/movie-web
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=https://keycloak.website/realms/movie-web
       - APP_SERVICES_IDENTITY=http://identity:8080/identity
     networks:
       - movie-web
   search:
-    image: search-service:v4
+    image: slayder2709/search-service:v4
     container_name: search-service
     ports:
       - "8084:8084"
@@ -140,7 +140,7 @@ services:
       - APP_HOST_NAME=elasticsearch
       - SPRING_APPLICATION_NAME=search-service
       - SPRING_ELASTICSEARCH_URIS=http://elasticsearch:9200
-      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://keycloak:8080/realms/movie-web
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=https://keycloak.website/realms/movie-web
     networks:
       - movie-web
   mysql:
@@ -204,19 +204,6 @@ services:
       - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092,EXTERNAL://host.docker.internal:9094
       - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT
       - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
-    networks:
-      - movie-web
-  keycloak:
-    image: quay.io/keycloak/keycloak:25.0.0
-    container_name: keycloak
-    ports:
-      - "8180:8080"
-    environment:
-      - KEYCLOAK_ADMIN=admin
-      - KEYCLOAK_ADMIN_PASSWORD=admin
-    command: start-dev
-    volumes:
-      - ./database/keycloak_data:/opt/keycloak/data
     networks:
       - movie-web
 networks:

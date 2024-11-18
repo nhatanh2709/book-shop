@@ -79,6 +79,7 @@ public class UserService {
                     .client_secret(clientSecret)
                     .scope("openid")
                     .build());
+            log.info("Token: {}", token);
 
             var creationResponse = identityClient.createUser(
                     "Bearer " + token.getAccessToken(),
@@ -115,6 +116,7 @@ public class UserService {
 
             return userMapper.toUserResponse(user);
         } catch (FeignException exception) {
+            log.info("Error : {}", exception);
             throw errorNormalizer.handleKeyCloakException(exception);
         }
     }

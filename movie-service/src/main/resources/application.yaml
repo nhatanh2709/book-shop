@@ -13,7 +13,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:8180/realms/movie-web
+          issuer-uri: https://keycloak.website/realms/movie-web
 app:
   services:
     identity: http://localhost:8080/identity
