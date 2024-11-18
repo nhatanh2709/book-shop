@@ -12,7 +12,7 @@ const PackageItem = props => {
     const navigate = useNavigate();
     useEffect(() => {
         const getPackage = async () => {
-            const res = await axios.get(`http://${process.env.REACT_APP_GATEWAY_HOST}:${process.env.REACT_APP_GATEWAY_PORT}/service3/api/bills/getPackage/${props.id}`, {
+            const res = await axios.get(`${process.env.REACT_APP_GATEWAY_URL}/service3/api/bills/getPackage/${props.id}`, {
                 headers: {
                     token: "Bearer " + JSON.parse(localStorage.getItem("user")).accessToken
                 }
@@ -27,7 +27,7 @@ const PackageItem = props => {
 
     useEffect(() => {
         const getInfoTransfer = async() => {
-            const res = await axios.post(`http://${process.env.REACT_APP_GATEWAY_HOST}:${process.env.REACT_APP_GATEWAY_PORT}/service3/api/bills/payment`, {
+            const res = await axios.post(`${process.env.REACT_APP_GATEWAY_URL}/service3/api/bills/payment`, {
                     email: user.email,
                     PackageID: Package._id
                 }, {

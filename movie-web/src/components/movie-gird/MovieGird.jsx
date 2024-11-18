@@ -35,7 +35,7 @@ const MovieGird = props => {
             }
             else {
                 try {
-                    const res = await axios.get(`http://${process.env.REACT_APP_GATEWAY_HOST}:${process.env.REACT_APP_GATEWAY_PORT}/api/v1/search/similar-movies`, {
+                    const res = await axios.get(`${process.env.REACT_APP_GATEWAY_URL}/api/v1/search/similar-movies`, {
                         params: {
                             movie_title: keyword
                         },
@@ -133,7 +133,7 @@ const MovieSearch = props => {
     useEffect(() => {
         const getMovies = async () => {
             try {
-                const res = await axios.get(`http://${process.env.REACT_APP_GATEWAY_HOST}:${process.env.REACT_APP_GATEWAY_PORT}/api/v1/search/similar-movies`, {
+                const res = await axios.get(`${process.env.REACT_APP_GATEWAY_URL}/api/v1/search/similar-movies`, {
                     params: {
                         movie_title: keyword
                     },

@@ -11,7 +11,7 @@ export default function Authenticate() {
     const fetchAuthCode = async (authCode) => {
       try {
         const response = await fetch(
-          `http://${process.env.REACT_APP_GATEWAY_HOST}:${process.env.REACT_APP_GATEWAY_PORT}/api/v1/identity/auth/outbound/authentication?code=${authCode}`,
+          `${process.env.REACT_APP_GATEWAY_URL}/api/v1/identity/auth/outbound/authentication?code=${authCode}`,
           {
             method: "POST",
           }

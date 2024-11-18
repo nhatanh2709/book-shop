@@ -10,7 +10,7 @@ const PostComment = props => {
         const getInfo = async () => {
             try {
                 const res = await axios.get(
-                    `http://${process.env.REACT_APP_GATEWAY_HOST}:${process.env.REACT_APP_GATEWAY_PORT}/api/v1/identity/users/myInfo`, {
+                    `${process.env.REACT_APP_GATEWAY_URL}/api/v1/identity/users/myInfo`, {
                         headers: {
                             Authorization: "Bearer "+JSON.parse(localStorage.getItem("user")).token
                           }
@@ -29,7 +29,7 @@ const PostComment = props => {
         e.preventDefault();
         try {
             const data = await axios.post(
-                `http://${process.env.REACT_APP_GATEWAY_HOST}:${process.env.REACT_APP_GATEWAY_PORT}/api/v1/movie/flims/interactive/post/` + props.id,
+                `${process.env.REACT_APP_GATEWAY_URL}/api/v1/movie/flims/interactive/post/` + props.id,
                 {
                     comment : comment,
                 },

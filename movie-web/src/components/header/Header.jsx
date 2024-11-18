@@ -30,7 +30,7 @@ const Header = () => {
     const [info, setInfo] = useState([]);
     useEffect(() => {
         const getInfo = async () => {
-          const res = await axios.get(`http://${process.env.REACT_APP_GATEWAY_HOST}:${process.env.REACT_APP_GATEWAY_PORT}/api/v1/profile/users/myProfile`, {
+          const res = await axios.get(`${process.env.REACT_APP_GATEWAY_URL}/api/v1/profile/users/myProfile`, {
             headers: {
               Authorization: "Bearer "+JSON.parse(localStorage.getItem("user")).token
             }

@@ -10,7 +10,7 @@ const Rating = props => {
     useEffect(() => {
         const getRating = async () => {
             try {
-                const res = await axios.get(`http://${process.env.REACT_APP_GATEWAY_HOST}:${process.env.REACT_APP_GATEWAY_PORT}/api/v1/movie/ratings/get/` + movieId,  
+                const res = await axios.get(`${process.env.REACT_APP_GATEWAY_URL}/api/v1/movie/ratings/get/` + movieId,  
                     {
                         headers: {
                             Authorization: "Bearer "+JSON.parse(localStorage.getItem("user")).token
@@ -30,7 +30,7 @@ const Rating = props => {
         const newRating = async () => {
             try {
                 console.log(rating);
-                await axios.post(`http://${process.env.REACT_APP_GATEWAY_HOST}:${process.env.REACT_APP_GATEWAY_PORT}/api/v1/movie/ratings/update`, {
+                await axios.post(`${process.env.REACT_APP_GATEWAY_URL}/api/v1/movie/ratings/update`, {
                     movieId: movieId,
                     ratings: rating,
                 },{

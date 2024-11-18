@@ -4,7 +4,7 @@ import Toastify from 'toastify-js';
 export const login = async(user, dispatch) => {
     dispatch(loginStart());
     try {
-        const res = await axios.post(`http://${process.env.REACT_APP_GATEWAY_HOST}:${process.env.REACT_APP_GATEWAY_PORT}/api/v1/identity/auth/token`, user);
+        const res = await axios.post(`${process.env.REACT_APP_GATEWAY_URL}/api/v1/identity/auth/token`, user);
         console.log(res.data);
         dispatch(loginSuccess(res.data.result));
         Toastify({

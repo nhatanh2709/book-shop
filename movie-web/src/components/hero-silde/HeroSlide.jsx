@@ -15,7 +15,7 @@ const HeroSlide = () => {
     useEffect(() => {
         const getRandomContent = async () => {
             try {
-                const res = await axios.get(`http://${process.env.REACT_APP_GATEWAY_HOST}:${process.env.REACT_APP_GATEWAY_PORT}/api/v1/movie/flims/findAll`,{
+                const res = await axios.get(`${process.env.REACT_APP_GATEWAY_URL}/api/v1/movie/flims/findAll`,{
                     headers: {
                         Authorization: "Bearer "+JSON.parse(localStorage.getItem("user")).token
                       }

@@ -15,7 +15,7 @@ const ForgotPassword = () => {
     const handleForgotPassWord = async(e) => {
         e.preventDefault();
         try {
-            const response = await axios.post(`http://${process.env.REACT_APP_GATEWAY_HOST}:${process.env.REACT_APP_GATEWAY_PORT}/api/v1/identity/auth/forgotPassword`, {email})
+            const response = await axios.post(`${process.env.REACT_APP_GATEWAY_URL}/api/v1/identity/auth/forgotPassword`, {email})
             console.log(response);
             Toastify({
                 text: response.data.message,

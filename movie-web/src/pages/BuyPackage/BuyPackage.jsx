@@ -9,7 +9,7 @@ const BuyPackage = () => {
   const [listPackage, setListPackage] = useState([]);
   useEffect(() => {
     const getPackage = async() => {
-      const res = await axios.get(`http://${process.env.REACT_APP_GATEWAY_HOST}:${process.env.REACT_APP_GATEWAY_PORT}/service3/api/bills/getAll` , {
+      const res = await axios.get(`${process.env.REACT_APP_GATEWAY_URL}/service3/api/bills/getAll` , {
           headers: {
             token: "Bearer " + JSON.parse(localStorage.getItem("user")).accessToken
           }

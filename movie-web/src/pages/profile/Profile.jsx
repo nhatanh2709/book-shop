@@ -30,7 +30,7 @@ const Profile = () => {
   const navigate = useNavigate();
   useEffect(() => {
     const getInfo = async () => {
-      const res = await axios.get(`http://${process.env.REACT_APP_GATEWAY_HOST}:${process.env.REACT_APP_GATEWAY_PORT}/api/v1/profile/users/myProfile`, {
+      const res = await axios.get(`${process.env.REACT_APP_GATEWAY_URL}/api/v1/profile/users/myProfile`, {
         headers: {
           Authorization: "Bearer "+JSON.parse(localStorage.getItem("user")).token
         }
@@ -95,7 +95,7 @@ const Profile = () => {
   const upProfile = async () => {
     try {
 
-      const res = await axios.put(`http://${process.env.REACT_APP_GATEWAY_HOST}:${process.env.REACT_APP_GATEWAY_PORT}/api/v1/profile/users/change`, info , {
+      const res = await axios.put(`${process.env.REACT_APP_GATEWAY_URL}/api/v1/profile/users/change`, info , {
         headers: {
           Authorization: "Bearer "+JSON.parse(localStorage.getItem("user")).token
         }

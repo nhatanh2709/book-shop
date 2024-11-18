@@ -9,7 +9,7 @@ const ListRating = () => {
     useEffect(() => {
         const getRating = async () => {
             try {
-                const res = await axios.get(`http://${process.env.REACT_APP_GATEWAY_HOST}:${process.env.REACT_APP_GATEWAY_PORT}/service2/api/ratings/getAll`, {
+                const res = await axios.get(`${process.env.REACT_APP_GATEWAY_URL}/service2/api/ratings/getAll`, {
                     headers: {
                         token: "Bearer "+JSON.parse(localStorage.getItem("user")).accessToken
                     }
@@ -23,7 +23,7 @@ const ListRating = () => {
         }
         const getUser = async () => {
             try {
-                const res = await axios.get(`http://${process.env.REACT_APP_GATEWAY_HOST}:${process.env.REACT_APP_GATEWAY_PORT}/service2/api/movies/getInfo`, {
+                const res = await axios.get(`${process.env.REACT_APP_GATEWAY_URL}/service2/api/movies/getInfo`, {
                     headers: {
                         token: "Bearer "+JSON.parse(localStorage.getItem("user")).accessToken
                     }
@@ -42,7 +42,7 @@ const ListRating = () => {
     useEffect(() => {
         const findHighestRatingMovies = async () => {
             try {
-                const response = await axios.post(`http://${process.env.REACT_APP_GATEWAY_HOST}:${process.env.REACT_APP_GATEWAY_PORT}/service2/api/movies/popular`, {
+                const response = await axios.post(`${process.env.REACT_APP_GATEWAY_URL}/service2/api/movies/popular`, {
                     ratings: ratings,
                     movies: movies
                 }, {
