@@ -66,7 +66,6 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
         String token = authHeader.getFirst().replace("Bearer", "");
 
         return identiyService.introspect(token).flatMap(introspectResponse -> {
-            log.info("Result:{}", introspectResponse.getResult().isValid());
             if (introspectResponse.getResult().isValid())
                 return chain.filter(exchange);
             else

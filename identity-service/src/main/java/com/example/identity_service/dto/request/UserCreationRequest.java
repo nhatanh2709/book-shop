@@ -9,7 +9,11 @@ import jakarta.validation.constraints.Size;
 
 import com.example.identity_service.validator.DobConstraint;
 
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 @Data
@@ -18,10 +22,13 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserCreationRequest {
-    @Size(min = 4, message = "USERNAME_INVALID")
+    @Size(min = 4, message = "INVALID_USERNAME")
     String username;
 
-    @Size(min = 4, message = "PASSWORD_INVALID")
+    @Nullable
+    String userId;
+
+    @Size(min = 4, message = "INVALID_PASSWORD")
     String password;
 
     @Email(message = "INVALID_EMAIL")

@@ -202,29 +202,7 @@ const Profile = () => {
         <div className='form-container'>
           <form action='' id="profileForm" className='form-desgin'>
             <div className='column-left'>
-              <label for="name" className='desgin-label'>User Name</label>
-              <input type='text'
-                name='name'
-                placeholder='Enter user name'
-                className='desgin-input' 
-                value={email}
-              ></input>
-
-              <label for="new-pass" className='desgin-label'>New Password</label>
-              <input type='text'
-                name='newPass'
-                className='desgin-input'
-                placeholder='Enter new password'
-                onChange={(e) => setNewPass(e.target.value)}
-              ></input>
-
-              <label for="confirm-pass" className='desgin-label'>Confirm Password</label>
-              <input type='text'
-                name='confirm-pass'
-                className='desgin-input'
-                placeholder='Confirm new password'
-                onChange={(e) => setConfirmPass(e.target.value)}
-              ></input>
+             
 
               <label for="age" className='desgin-label'>FirstName</label>
               <input type='text'

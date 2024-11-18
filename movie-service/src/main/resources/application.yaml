@@ -9,6 +9,11 @@ spring:
     mongodb:
       uri: mongodb+srv://anh:27092004@backenddb.2qdkr.mongodb.net/?retryWrites=true&w=majority&appName=BackendDB
       database: movie-web
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8180/realms/movie-web
 app:
   services:
     identity: http://localhost:8080/identity

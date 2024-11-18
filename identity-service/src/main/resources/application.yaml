@@ -3,6 +3,8 @@ server:
   servlet:
     context-path: /identity
 spring:
+  application:
+    name: identity-service
   datasource:
     url: "jdbc:mysql://localhost:3307/identity_service"
     driverClassName: "com.mysql.cj.jdbc.Driver"
@@ -17,14 +19,30 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-jwt:
-  signerKey: "2QbAyVf+5QAwTjONMGpHAI9pg+43vqXUT43MWqF50Z3lhOvGTzvphfikaeI33/sd"
-  valid-duration: 360000
-  refreshable-duration: 864000
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8180/realms/movie-web
+
+idp:
+  url: http://localhost:8180
+  client-id: Movie_web
+  client-secret: J0x148IBCmFNDn94eiomwyNgbNCzBuuS
 
 app:
   services:
     profile: http://localhost:8081/profile
+
+
+keycloak:
+  realm: movie-web
+  adminClientId: admin-cli
+  adminClientSecret: k93fNyuPIOVWFB1qVSwXnXvM9JMueh9C
+  client: Movie_web
+  urls:
+    auth: http://localhost:8180
+
 
 google:
   clientId: "309829967812-k45di4ubndsbv94fft0cjhabgcikca1o.apps.googleusercontent.com"

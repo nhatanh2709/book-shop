@@ -8,18 +8,17 @@ import "./forgotPassword.scss";
 import Toastify from 'toastify-js';
 const ForgotPassword = () => {
 
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
+    const [email, setEmail] = useState("");
     const navigate = useNavigate();
 
 
     const handleForgotPassWord = async(e) => {
         e.preventDefault();
         try {
-            const response = await axios.put(`http://${process.env.REACT_APP_GATEWAY_HOST}:${process.env.REACT_APP_GATEWAY_PORT}/api/v1/identity/users/updateInfo`, {username, password})
+            const response = await axios.post(`http://${process.env.REACT_APP_GATEWAY_HOST}:${process.env.REACT_APP_GATEWAY_PORT}/api/v1/identity/auth/forgotPassword`, {email})
             console.log(response);
             Toastify({
-                text: "Change password success",
+                text: response.data.message,
                 style: {
                   background: "linear-gradient(to right, #00b09b, #96c93d)",
                   display : "flex",
@@ -48,15 +47,11 @@ const ForgotPassword = () => {
                     <form action="">
                         <h1>Change Password</h1>
                         <div className="input-box">
-                            <input type="username" placeholder="Username" required onChange={(e) => setUsername(e.target.value)} />
+                            <input type="email" placeholder="email" required onChange={(e) => setEmail(e.target.value)} />
                             <SiGmail className="icon" />
                         </div>
 
 
-                        <div className="input-box">
-                            <input type="password" placeholder="password" required onChange={(e) => setPassword(e.target.value)} />
-                            <FaLock className="icon" />
-                        </div>
 
 
                         <div className="remember-forgot">
@@ -83,15 +78,6 @@ const ForgotPassword = () => {
                             </p>
                         </div>
 
-                        <div className="register-link">
-                            <p>Continue with Google ?
-                                <a href="#">
-                                    <Link to="/loginAI">
-                                        Login
-                                    </Link>
-                                </a>
-                            </p>
-                        </div>
                     </form>
                 </div>
             </div>

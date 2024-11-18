@@ -1,0 +1,3 @@
+./database/data_mysql/*
+./database/neo4j_data
+./profile-service/neo4j_data/*

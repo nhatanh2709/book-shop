@@ -18,7 +18,6 @@ export default function Register() {
 
         try {
             const response = await axios.post(`http://${process.env.REACT_APP_GATEWAY_HOST}:${process.env.REACT_APP_GATEWAY_PORT}/api/v1/identity/users/registration`, { email, username, password });
-            console.log(response);
             Toastify({
                 text: "Register Successfully",
                 style: {

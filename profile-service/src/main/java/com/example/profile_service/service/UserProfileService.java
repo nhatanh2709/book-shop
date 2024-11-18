@@ -43,12 +43,11 @@ public class UserProfileService {
 
         return userProfileMapper.toUserProfileReponse(userProfile);
     }
-
+//
     public UserProfileResponse updateProfile(ProfileUpdateRequest request) {
         UserResponse userResponse = identityClient.getMyInfo().getResult();
         UserProfile userProfile = userProfileRepository.findByUserId(userResponse.getId()).orElseThrow(() ->
                 new AppException(ErrorCode.USER_NOT_EXISTED));
-        log.info("Request: {}", request);
         if (request.getProfilePic() != null) {
             userProfile.setProfilePic(request.getProfilePic());
         }
@@ -67,12 +66,13 @@ public class UserProfileService {
 
         return userProfileMapper.toUserProfileReponse(userProfileRepository.save(userProfile));
     }
-
-
+//
+//
     public void deleteProfile(String id) {
         userProfileRepository.deleteById(id);
     }
 
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public List<UserProfileResponse> getAllProfiles() {
         var profiles = userProfileRepository.findAll();
         return profiles.stream().map(userProfileMapper::toUserProfileReponse).toList();

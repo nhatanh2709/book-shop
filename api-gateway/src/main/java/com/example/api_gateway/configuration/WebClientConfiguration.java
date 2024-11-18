@@ -1,6 +1,6 @@
 package com.example.api_gateway.configuration;
 
-import com.example.api_gateway.repository.IdentityClient;
+import com.example.api_gateway.repository.httpClient.IdentityClient;
 
 
 import org.springframework.beans.factory.annotation.Value;

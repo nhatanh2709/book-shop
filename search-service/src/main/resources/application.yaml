@@ -11,3 +11,8 @@ spring:
     name: search-service
   elasticsearch:
     uris: http://localhost:9200
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8180/realms/movie-web

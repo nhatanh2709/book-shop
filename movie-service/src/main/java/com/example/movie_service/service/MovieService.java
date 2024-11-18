@@ -1,5 +1,6 @@
 package com.example.movie_service.service;
 
+import com.example.movie_service.dto.ApiResponse;
 import com.example.movie_service.dto.Comment;
 import com.example.movie_service.dto.request.CatalogMovieRequest;
 import com.example.movie_service.dto.request.CommentCreationRequest;
@@ -10,6 +11,7 @@ import com.example.movie_service.exception.AppException;
 import com.example.movie_service.exception.ErrorCode;
 import com.example.movie_service.mapper.MovieMapper;
 import com.example.movie_service.repository.MovieRepository;
+import com.example.movie_service.repository.httpClient.IdentityClient;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -30,6 +32,7 @@ import java.util.Random;
 public class MovieService {
     MovieRepository movieRepository;
     MovieMapper movieMapper;
+    IdentityClient identityClient;
 
     public MovieResponse findMovieBySlug(String Slug) {
         Movie movie = movieRepository.findBySlug(Slug).orElseThrow(() ->
@@ -100,10 +103,10 @@ public class MovieService {
     public MovieResponse postComment(String movieId, CommentCreationRequest comment) {
         Movie movie = movieRepository.findByMovieId(movieId).orElseThrow(() ->
                 new AppException(ErrorCode.FIND_MOVIE_BY_ID_FAILED));
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        ApiResponse<UserResponse> response = identityClient.getMyInfo();
         Comment commentCreationRequest = Comment.builder()
                 .timestamp(new Date())
-                .username(authentication.getName())
+                .username(response.getResult().getUsername())
                 .comment(comment.getComment())
                 .build();
 

@@ -1,0 +1,224 @@
+version: '3.8'
+
+services:
+  api-gateway:
+    container_name: api-gateway
+    image: api-gateway:v4
+    ports:
+      - "8888:8888"
+    environment:
+      - SPRING_APPLICATION_NAME=api-gateway
+      - APP_SERVICES_IDENTITY=http://identity:8085/identity
+      - APP_API_PREFIX=/api/v1
+      - APP_HOST_NAME=localhost
+      - SPRING_CLOUD_GATEWAY_ROUTES[0]_ID=identity_service
+      - SPRING_CLOUD_GATEWAY_ROUTES[0]_URI=http://identity:8080
+      - SPRING_CLOUD_GATEWAY_ROUTES[0]_PREDICATES[0]=Path=/api/v1/identity/**
+      - SPRING_CLOUD_GATEWAY_ROUTES[0]_FILTERS[0]=StripPrefix=2
+      - SPRING_CLOUD_GATEWAY_ROUTES[1]_ID=profile_service
+      - SPRING_CLOUD_GATEWAY_ROUTES[1]_URI=http://profile:8081
+      - SPRING_CLOUD_GATEWAY_ROUTES[1]_PREDICATES[0]=Path=/api/v1/profile/users/**
+      - SPRING_CLOUD_GATEWAY_ROUTES[1]_FILTERS[0]=StripPrefix=2
+      - SPRING_CLOUD_GATEWAY_ROUTES[2]_ID=notification_service
+      - SPRING_CLOUD_GATEWAY_ROUTES[2]_URI=http://notification:8082
+      - SPRING_CLOUD_GATEWAY_ROUTES[2]_PREDICATES[0]=Path=/api/v1/notification/**
+      - SPRING_CLOUD_GATEWAY_ROUTES[2]_FILTERS[0]=StripPrefix=2
+      - SPRING_CLOUD_GATEWAY_ROUTES[3]_ID=movie_service
+      - SPRING_CLOUD_GATEWAY_ROUTES[3]_URI=http://movie:8083
+      - SPRING_CLOUD_GATEWAY_ROUTES[3]_PREDICATES[0]=Path=/api/v1/movie/**
+      - SPRING_CLOUD_GATEWAY_ROUTES[3]_FILTERS[0]=StripPrefix=2
+      - SPRING_CLOUD_GATEWAY_ROUTES[4]_ID=search_service
+      - SPRING_CLOUD_GATEWAY_ROUTES[4]_URI=http://search:8084
+      - SPRING_CLOUD_GATEWAY_ROUTES[4]_PREDICATES[0]=Path=/api/v1/search/**
+      - SPRING_CLOUD_GATEWAY_ROUTES[4]_FILTERS[0]=StripPrefix=2
+    networks:
+      - movie-web
+    depends_on:
+      - identity
+  identity:
+    container_name: identity_service
+    image: identity-service:v4
+    ports:
+      - "8085:8080"
+    environment:
+      - SERVER_PORT=8080
+      - SERVER_SERVLET_CONTEXT_PATH=/identity
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/identity_service
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=anhproqn999
+      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=com.mysql.cj.jdbc.Driver
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - SPRING_JPA_SHOW_SQL=true
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=host.docker.internal:9094
+      - SPRING_KAFKA_PRODUCER_KEY_SERIALIZER=org.apache.kafka.common.serialization.StringSerializer
+      - SPRING_KAFKA_PRODUCER_VALUE_SERIALIZER=org.springframework.kafka.support.serializer.JsonSerializer
+      - JWT_SIGNER_KEY=2QbAyVf+5QAwTjONMGpHAI9pg+43vqXUT43MWqF50Z3lhOvGTzvphfikaeI33/sd
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://keycloak:8080/realms/movie-web
+      - IDP_URL=http://keycloak:8080
+      - IDP_CLIENT_ID=Movie_web
+      - IDP_CLIENT_SECRET=J0x148IBCmFNDn94eiomwyNgbNCzBuuS
+      - KEYCLOAK_REALM=movie-web
+      - KEYCLOAK_ADMIN_CLIENT_ID=admin-cli
+      - KEYCLOAK_ADMIN_CLIENT_SECRET=k93fNyuPIOVWFB1qVSwXnXvM9JMueh9C
+      - KEYCLOAK_CLIENT=Movie_web
+      - KEYCLOAK_URLS_AUTH=http://keycloak:8080
+      - JWT_VALID_DURATION=360000
+      - JWT_REFRESHABLE_DURATION=864000
+      - APP_SERVICES_PROFILE=http://profile:8081/profile
+      - GOOGLE_CLIENT_ID=309829967812-k45di4ubndsbv94fft0cjhabgcikca1o.apps.googleusercontent.com
+      - GOOGLE_CLIENT_SECRET=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
+      - GOOGLE_REDIRECT_URI=http://localhost:3000/authenticate
+    networks:
+      - movie-web
+    depends_on:
+      - mysql
+  profile:
+    container_name: profile_service
+    image: profile-service:v4
+    ports:
+      - "8081:8081"
+    environment:
+      - SERVER_PORT=8081
+      - SERVER_SERVLET_CONTEXT_PATH=/profile
+      - SPRING_APPLICATION_NAME=profile-service
+      - SPRING_NEO4J_URI=bolt://neo4j:7687
+      - SPRING_NEO4J_AUTHENTICATION_USERNAME=neo4j
+      - SPRING_NEO4J_AUTHENTICATION_PASSWORD=123456789
+      - APP_SERVICES_IDENTITY=http://identity:8080/identity
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://keycloak:8080/realms/movie-web
+    depends_on:
+      - neo4j
+      - kafka
+    networks:
+      - movie-web
+  notification:
+    image: notification-service:v4
+    container_name: notification-service
+    ports:
+      - "8082:8082"
+    depends_on:
+      - kafka
+    environment:
+      - SERVER_PORT=8082
+      - SPRING_APPLICATION_NAME=notification-service
+      - SERVER_SERVLET_CONTEXT_PATH=/notification
+      - SPRING_DATA_MONGODB_URI=mongodb+srv://anh:27092004@backenddb.2qdkr.mongodb.net/?retryWrites=true&w=majority&appName=BackendDB
+      - SPRING_DATA_MONGODB_DATABASE=movie-web
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=host.docker.internal:9094
+      - SPRING_KAFKA_CONSUMER_GROUP_ID=notification-group
+      - SPRING_KAFKA_CONSUMER_AUTO_OFFSET_RESET=earliest
+      - SPRING_KAFKA_CONSUMER_KEY_DESERIALIZER=org.apache.kafka.common.serialization.StringDeserializer
+      - SPRING_KAFKA_CONSUMER_VALUE_DESERIALIZER=org.springframework.kafka.support.serializer.JsonDeserializer
+      - SPRING_KAFKA_CONSUMER_PROPERTIES_SPRING_JSON_TRUSTED_PACKAGES=*
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://keycloak:8080/realms/movie-web
+      - NOTIFICATION_EMAIL_BREVO_APIKEY=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
+    networks:
+      - movie-web
+  movie:
+    image: movie-service:v4
+    container_name: movie-service
+    ports:
+      - "8083:8083"
+    environment:
+      - SERVER_PORT=8083
+      - SERVER_SERVLET_CONTEXT_PATH=/movie
+      - SPRING_APPLICATION_NAME=movie-service
+      - SPRING_DATA_MONGODB_URI=mongodb+srv://anh:27092004@backenddb.2qdkr.mongodb.net/?retryWrites=true&w=majority&appName=BackendDB
+      - SPRING_DATA_MONGODB_DATABASE=movie-web
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://keycloak:8080/realms/movie-web
+      - APP_SERVICES_IDENTITY=http://identity:8080/identity
+    networks:
+      - movie-web
+  search:
+    image: search-service:v4
+    container_name: search-service
+    ports:
+      - "8084:8084"
+    environment:
+      - SERVER_PORT=8084
+      - SERVER_SERVLET_CONTEXT_PATH=/search
+      - APP_HOST_NAME=elasticsearch
+      - SPRING_APPLICATION_NAME=search-service
+      - SPRING_ELASTICSEARCH_URIS=http://elasticsearch:9200
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://keycloak:8080/realms/movie-web
+    networks:
+      - movie-web
+  mysql:
+    image: mysql:8.0
+    restart: always
+    container_name: mysql
+    environment:
+      - MYSQL_DATABASE=identity_service
+      - MYSQL_ROOT_PASSWORD=anhproqn999
+    ports:
+      - "3307:3306"
+    volumes:
+      - ./database/data_mysql:/var/lib/mysql
+    networks:
+      - movie-web
+  neo4j:
+    image: neo4j:5.25.1
+    container_name: neo4j
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    environment:
+      NEO4J_AUTH: neo4j/123456789
+    volumes:
+      - ./database/neo4j_data:/data
+    networks:
+      - movie-web
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.4.0
+    container_name: elasticsearch
+    restart: always
+    environment:
+      - xpack.security.enabled=false
+      - discovery.type=single-node
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    cap_add:
+      - IPC_LOCK
+    volumes:
+      - ./database/elasticsearch-data:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+    networks:
+      - movie-web
+  kafka:
+    image: bitnami/kafka:3.7.0
+    container_name: kafka
+    hostname: kafka
+    ports:
+      - '9094:9094'
+    environment:
+      - KAFKA_CFG_NODE_ID=0
+      - KAFKA_CFG_PROCESS_ROLES=controller,broker
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093,EXTERNAL://:9094
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092,EXTERNAL://host.docker.internal:9094
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+    networks:
+      - movie-web
+  keycloak:
+    image: quay.io/keycloak/keycloak:25.0.0
+    container_name: keycloak
+    ports:
+      - "8180:8080"
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+    command: start-dev
+    volumes:
+      - ./database/keycloak_data:/opt/keycloak/data
+    networks:
+      - movie-web
+networks:
+  movie-web:
+    driver: bridge

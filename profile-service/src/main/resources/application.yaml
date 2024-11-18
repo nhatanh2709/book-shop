@@ -11,6 +11,11 @@ spring:
     authentication:
       username: neo4j
       password: anhproqn999ABC@
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8180/realms/movie-web
 
 app:
   services:

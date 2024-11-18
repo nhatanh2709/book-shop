@@ -1,267 +1,334 @@
 package com.example.identity_service.service;
 
-import java.text.ParseException;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.*;
-
 import com.example.event.dto.NotificationEvent;
-import com.example.identity_service.constant.PredefinedRole;
+import com.example.identity_service.dto.identity.Credential;
+import com.example.identity_service.dto.identity.UserCreationParam;
 import com.example.identity_service.dto.request.*;
-import com.example.identity_service.entiy.Role;
+import com.example.identity_service.dto.response.*;
+import com.example.identity_service.entity.InvalidatedToken;
+import com.example.identity_service.entity.RefreshToken;
+import com.example.identity_service.entity.User;
+import com.example.identity_service.exception.AppException;
+import com.example.identity_service.exception.ErrorCode;
+import com.example.identity_service.exception.ErrorNormalizer;
+import com.example.identity_service.mapper.UserMapper;
+import com.example.identity_service.repository.httpClient.IdentityClient;
+import com.example.identity_service.repository.InvalidatedTokenRepository;
+import com.example.identity_service.repository.RefreshTokenRepository;
+import com.example.identity_service.repository.UserRepository;
 import com.example.identity_service.repository.httpClient.OutboundIdentityClient;
 import com.example.identity_service.repository.httpClient.OutboundUserClient;
 import com.example.identity_service.repository.httpClient.ProfileClient;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
-
-import com.example.identity_service.dto.response.AuthenticationResponse;
-import com.example.identity_service.dto.response.IntrospectResponse;
-import com.example.identity_service.dto.response.RefreshTokenResponse;
-import com.example.identity_service.entiy.InvalidatedToken;
-import com.example.identity_service.entiy.User;
-import com.example.identity_service.exception.AppException;
-import com.example.identity_service.exception.ErrorCode;
-import com.example.identity_service.repository.InvalidatedTokenRepository;
-import com.example.identity_service.repository.UserRepostitory;
-import com.nimbusds.jose.*;
-import com.nimbusds.jose.crypto.MACSigner;
-import com.nimbusds.jose.crypto.MACVerifier;
-import com.nimbusds.jwt.JWTClaimsSet;
+import com.example.identity_service.service.keycloak.KeyCloakService;
+import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jwt.SignedJWT;
-
+import feign.FeignException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+import java.text.Normalizer;
+import java.text.ParseException;
+import java.util.Date;
+import java.util.List;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AuthenticationService {
-    UserRepostitory userRepostitory;
+    UserRepository userRepository;
     InvalidatedTokenRepository invalidatedTokenRepository;
-    OutboundIdentityClient outboundIdentityClient;
+    IdentityClient identityClient;
+    ErrorNormalizer errorNormalizer;
+    RefreshTokenRepository refreshTokenRepository;
     OutboundUserClient outboundUserClient;
+    OutboundIdentityClient outboundIdentityClient;
+    UserMapper userMapper;
+    KeyCloakService keyCloakService;
+    KafkaTemplate<String , Object> kafkaTemplate;
     ProfileClient profileClient;
-
-    @NonFinal
-    @Value("${jwt.signerKey}")
-    protected String SIGNER_KEY;
-
-    @NonFinal
-    @Value("${jwt.valid-duration}")
-    protected long VALID_DURATION;
-
-    @NonFinal
-    @Value("${jwt.refreshable-duration}")
-    protected long REFRESHABLE_DURATION;
-
     @NonFinal
     @Value("${google.clientId}")
     protected String CLIENT_ID;
+
+    @Value("${idp.client-id}")
+    @NonFinal
+    String clientId;
+
+    @Value("${idp.client-secret}")
+    @NonFinal
+    String clientSecret;
 
 
     @NonFinal
     @Value("${google.clientSecret}")
     protected String CLIENT_SECRET;
 
-
-    private String REDIRECT_URI = "https://movie.nhatanhweb.website/authenticate";
+    @NonFinal
+    @Value("${google.redirectUri}")
+    protected String REDIRECT_URI;
 
     @NonFinal
     protected final String GRANT_TYPE = "authorization_code";
 
-    KafkaTemplate<String, Object> kafkaTemplate;
+    public AuthenticationResponse outboundAuthenticate(String code) throws JOSEException, ParseException {
+        var response = outboundIdentityClient.exchangeToken(ExchangeTokenRequest.builder()
+                        .code(code)
+                        .clientId(CLIENT_ID)
+                        .clientSecret(CLIENT_SECRET)
+                        .grantType(GRANT_TYPE)
+                        .redirectUri(REDIRECT_URI)
+                        .build());
+        var userInfo = outboundUserClient.getUserInfo("json", response.getAccessToken());
+        log.info("UserInfo: {}", userInfo);
 
-    public IntrospectResponse introspect(IntroSpectRequest request) throws JOSEException, ParseException {
-        var token = request.getToken();
+        boolean isRegister = false;
+        if(userRepository.existsByEmail(userInfo.getEmail())) {
+            isRegister = true;
+        }
+        log.info("isRegister: {}", isRegister);
+        String userId = null;
 
+        if(!isRegister) {
+            var token = identityClient.exchangeToken(ClientExchangeTokenRequest.builder()
+                    .grant_type("client_credentials")
+                    .client_id(clientId)
+                    .client_secret(clientSecret)
+                    .scope("openid")
+                    .build());
+            var creationResponse = identityClient.createUser(
+                    "Bearer " + token.getAccessToken(),
+                    UserCreationParam.builder()
+                            .username(convert(userInfo.getName()))
+                            .email(userInfo.getEmail())
+                            .firstName(userInfo.getGivenName())
+                            .lastName(userInfo.getFamilyName())
+                            .enabled(true)
+                            .emailVerified(true)
+                            .credentials(List.of(Credential.builder()
+                                    .type("password")
+                                    .temporary(false)
+                                    .value("1")
+                                    .build()))
+                            .build());
+            userId = extractUserId(creationResponse);
+            userRepository.save(User.builder()
+                    .username(convert(userInfo.getName()))
+                    .email(userInfo.getEmail())
+                    .userId(userId)
+                    .build());
+        }
+        log.info("UserId: {}", userId);
+        User user = userRepository.findByEmail(userInfo.getEmail()).orElseThrow(() ->
+                new AppException(ErrorCode.EMAIL_NOT_EXISTED)
+                );
+        log.info("User: {}", user);
+
+        UserExchangeTokenRequest TokenRequest = UserExchangeTokenRequest.builder()
+                .client_id(clientId)
+                .client_secret(clientSecret)
+                .grant_type("password")
+                .scope("openid")
+                .username(user.getUsername())
+                .password("1")
+                .build();
+
+        UserExchangeTokenResponse token = identityClient.exchangeUserToken(TokenRequest);
+        SignedJWT signedJWT =  SignedJWT.parse(token.getAccessToken());
+        RefreshToken refreshToken = RefreshToken.builder()
+                .id(signedJWT.getJWTClaimsSet().getJWTID())
+                .refreshToken(token.getRefreshToken())
+                .build();
+
+        refreshTokenRepository.save(refreshToken);
+        if(!isRegister) {
+            profileClient.createProfile(ProfileCreationRequest.builder()
+                            .firstName(userInfo.getGivenName())
+                            .lastName(userInfo.getFamilyName())
+                            .userId(user.getId())
+                    .build());
+
+            NotificationEvent notificationEvent = NotificationEvent.builder()
+                    .channel("EMAIL")
+                    .recipient(userInfo.getEmail())
+                    .subject(userInfo.getName())
+                    .build();
+
+            kafkaTemplate.send("notification-delivery", notificationEvent);
+        }
+
+        return AuthenticationResponse.builder()
+                .token(token.getAccessToken()).authenticated(true)
+                .build();
+
+
+
+    }
+
+    public void forgotPassword(ForgotPasswordRequest request) {
+        String email = request.getEmail();
+        var user = userRepository.findByEmail(email).orElseThrow(() ->
+                new AppException(ErrorCode.EMAIL_NOT_EXISTED)
+                );
+        String userId = user.getUserId();
+        keyCloakService.updatePassword(userId);
+    }
+
+    private String extractUserId(ResponseEntity<?> response) {
+        String location = response.getHeaders().get("Location").getFirst();
+        String[] splitedStr = location.split("/");
+        return splitedStr[splitedStr.length - 1];
+    }
+
+    public IntrospectResponse introspect(IntrospectRequest request) throws ParseException, JOSEException {
+        String token = request.getToken();
         boolean isValid = true;
         try {
-            verifyToken(token, false);
+            verifyToken(token);
         } catch (AppException e) {
             isValid = false;
         }
-
-        return IntrospectResponse.builder().valid(isValid).build();
+        return IntrospectResponse.builder()
+                .valid(isValid)
+                .build();
     }
 
-    public AuthenticationResponse outboundAuthenticate(String code) {
-        log.info("Login By Google");
-        log.info("code: {}", code);
-        log.info("ClientID: {}", CLIENT_ID);
-        log.info("ClientSecret: {}", CLIENT_SECRET);
-        log.info("GRANT_TYPE: {}", GRANT_TYPE);
-        log.info("REDIRECTED_URL : {}", REDIRECT_URI);
-        var response = outboundIdentityClient.exchangeToken(ExchangeTokenRequest.builder()
-                .code(code)
-                .clientId(CLIENT_ID)
-                .clientSecret(CLIENT_SECRET)
-                .redirectUri(REDIRECT_URI)
-                .grantType(GRANT_TYPE)
-                .build());
-        log.info("Google Reponse: {}", response);
-
-        Set<Role> roles = new HashSet<>();
-        roles.add(Role.builder().name(PredefinedRole.USER_ROLE).build());
-
-        var userInfo = outboundUserClient.getUserInfo("json", response.getAccessToken());
-        boolean isRegister = false;
-        if (userRepostitory.existsByEmail(userInfo.getEmail())) {
-            isRegister = true;
-        }
-        log.info("UserInfo: {}", userInfo);
-
-        User user = userRepostitory.findByEmail(userInfo.getEmail()).orElseGet(() -> {
-
-                    User newUser = userRepostitory.save(User.builder()
-                            .username(userInfo.getName())
-                            .email(userInfo.getEmail())
-                            .roles(roles)
-                            .build());
-                    profileClient.createProfile(ProfileCreationRequest.builder()
-                            .firstName(userInfo.getGivenName())
-                            .lastName(userInfo.getFamilyName())
-                            .userId(newUser.getId())
-                            .build());
-                    return newUser;
-                }
-
-        );
-        log.info("User: {}", user);
-        NotificationEvent notificationEvent = NotificationEvent.builder()
-                .channel("EMAIL")
-                .recipient(userInfo.getEmail())
-                .subject(userInfo.getName())
+    public RefreshTokenResponse refreshToken() throws JOSEException, ParseException {
+        RefreshTokenRequest request = RefreshTokenRequest.builder()
+                .token(getToken())
+                .build();
+        SignedJWT signedJWT = SignedJWT.parse(request.getToken());
+        String id = signedJWT.getJWTClaimsSet().getJWTID();
+        RefreshToken old_refreshToken = refreshTokenRepository.findById(id).orElseThrow(() ->
+                new AppException(ErrorCode.UNAUTHENTICATED));
+        RefreshTokenExchangeRequest TokenRequest = RefreshTokenExchangeRequest.builder()
+                .client_id(clientId)
+                .client_secret(clientSecret)
+                .grant_type("refresh_token")
+                .refresh_token(old_refreshToken.getRefreshToken())
                 .build();
 
-        if (!isRegister) {
-            kafkaTemplate.send("notification-delivery", notificationEvent);
-        }
-        log.info("Send Message Successfully");
-        var token = generateToken(user);
-        log.info("Token: {}", token);
-        return AuthenticationResponse.builder()
-                .token(token)
+        RefreshTokenExchangeResponse token = identityClient.refreshToken(TokenRequest);
+        signedJWT =  SignedJWT.parse(token.getAccessToken());
+        RefreshToken new_refreshToken = RefreshToken.builder()
+                .id(signedJWT.getJWTClaimsSet().getJWTID())
+                .refreshToken(token.getAccessToken())
+                .build();
+
+        refreshTokenRepository.save(new_refreshToken);
+        return RefreshTokenResponse.builder()
+                .token(token.getAccessToken())
                 .authenticated(true)
                 .build();
+
     }
 
-    public AuthenticationResponse authenticate(AuthenticationRequest request) {
-
-        var user = userRepostitory
-                .findByUsername(request.getUsername())
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
-        boolean authenticated = passwordEncoder.matches(request.getPassword(), user.getPassword());
-
-        if (!authenticated) {
-            throw new AppException(ErrorCode.UNAUTHENTICATED);
-        }
-
-        var token = generateToken(user);
-        return AuthenticationResponse.builder().token(token).authenticated(true).build();
-    }
-
-    private String generateToken(User user) {
-        JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
-        JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
-                .subject(user.getUsername())
-                .issuer("nhatanh2709.com")
-                .issueTime(new Date())
-                .expirationTime(new Date(
-                        Instant.now().plus(VALID_DURATION, ChronoUnit.SECONDS).toEpochMilli()))
-                .jwtID(UUID.randomUUID().toString())
-                .claim("scope", buildScope(user))
-                .build();
-
-        Payload payload = new Payload(jwtClaimsSet.toJSONObject());
-        JWSObject jwsObject = new JWSObject(header, payload);
+    public AuthenticationResponse authenticate(AuthenticationRequest request) throws JOSEException , ParseException {
         try {
-            jwsObject.sign(new MACSigner(SIGNER_KEY.getBytes()));
-            return jwsObject.serialize();
-        } catch (JOSEException e) {
-            throw new RuntimeException(e);
+            User user = userRepository.findByUsername(request.getUsername())
+                    .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+            UserExchangeTokenRequest TokenRequest = UserExchangeTokenRequest.builder()
+                    .client_id(clientId)
+                    .client_secret(clientSecret)
+                    .grant_type("password")
+                    .scope("openid")
+                    .username(request.getUsername())
+                    .password(request.getPassword())
+                    .build();
+
+            UserExchangeTokenResponse token = identityClient.exchangeUserToken(TokenRequest);
+            SignedJWT signedJWT =  SignedJWT.parse(token.getAccessToken());
+            RefreshToken refreshToken = RefreshToken.builder()
+                    .id(signedJWT.getJWTClaimsSet().getJWTID())
+                    .refreshToken(token.getRefreshToken())
+                    .build();
+
+            refreshTokenRepository.save(refreshToken);
+
+            return AuthenticationResponse.builder()
+                    .token(token.getAccessToken()).authenticated(true)
+                    .build();
+        } catch (FeignException exception) {
+            throw errorNormalizer.handleKeyCloakException(exception);
         }
     }
 
-    public void logout(LogoutRequest request) throws JOSEException, ParseException {
-        try {
-            var signToken = verifyToken(request.getToken(), true);
-            String jwtID = signToken.getJWTClaimsSet().getJWTID();
-            Date expireTime = signToken.getJWTClaimsSet().getExpirationTime();
 
-            InvalidatedToken invalidatedToken =
-                    InvalidatedToken.builder().id(jwtID).expiryTime(expireTime).build();
+
+    public void logout() throws JOSEException, ParseException {
+        try {
+            String token = getToken();
+            SignedJWT signedJWT = verifyToken(token);
+            var jit = signedJWT.getJWTClaimsSet().getJWTID();
+            InvalidatedToken invalidatedToken = InvalidatedToken
+                    .builder().id(jit).build();
 
             invalidatedTokenRepository.save(invalidatedToken);
         } catch (AppException e) {
-            log.info("Token already expired");
-        }
-    }
-
-    public RefreshTokenResponse refreshToken(RefreshTokenRequest request) throws ParseException, JOSEException {
-        var signJWT = verifyToken(request.getToken(), true);
-
-        var jit = signJWT.getJWTClaimsSet().getJWTID();
-        var expireTime = signJWT.getJWTClaimsSet().getExpirationTime();
-
-        InvalidatedToken invalidatedToken =
-                InvalidatedToken.builder().id(jit).expiryTime(expireTime).build();
-
-        invalidatedTokenRepository.save(invalidatedToken);
-
-        var username = signJWT.getJWTClaimsSet().getSubject();
-        var user =
-                userRepostitory.findByUsername(username).orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
-
-        var token = generateToken(user);
-        return RefreshTokenResponse.builder().token(token).authenticated(true).build();
-    }
-
-    private SignedJWT verifyToken(String token, Boolean isRefresh) throws JOSEException, ParseException {
-
-        JWSVerifier verifier = new MACVerifier(SIGNER_KEY.getBytes());
-        SignedJWT signedJWT = SignedJWT.parse(token);
-
-        Date expiredTime = (isRefresh)
-                ? new Date(signedJWT
-                .getJWTClaimsSet()
-                .getIssueTime()
-                .toInstant()
-                .plus(REFRESHABLE_DURATION, ChronoUnit.SECONDS)
-                .toEpochMilli())
-                : signedJWT.getJWTClaimsSet().getExpirationTime();
-
-        var verified = signedJWT.verify(verifier);
-
-        if (!(verified && expiredTime.after(new Date()))) {
             throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
 
-        if (invalidatedTokenRepository.existsById(signedJWT.getJWTClaimsSet().getJWTID())) {
+
+    }
+
+
+    public SignedJWT verifyToken(String token) throws JOSEException , ParseException {
+
+
+        SignedJWT signedJWT = SignedJWT.parse(token);
+
+        Date expriedTime = new Date(signedJWT.getJWTClaimsSet()
+                .getIssueTime().toInstant().toEpochMilli()
+
+        );
+        if(expriedTime.after(new Date())) {
+            throw  new AppException(ErrorCode.UNAUTHENTICATED);
+        }
+        if(invalidatedTokenRepository.existsById(signedJWT.getJWTClaimsSet().getJWTID())) {
             throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
         return signedJWT;
+
     }
 
-    private String buildScope(User user) {
-        StringJoiner stringJoiner = new StringJoiner(" ");
-        if (!CollectionUtils.isEmpty(user.getRoles())) {
-            user.getRoles().forEach(role -> {
-                stringJoiner.add("ROLE_" + role.getName());
-                if (!CollectionUtils.isEmpty(role.getPermissions())) {
-                    role.getPermissions().forEach(permission -> stringJoiner.add(permission.getName()));
-                }
-            });
+    private String getToken() throws JOSEException, ParseException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        ServletRequestAttributes servletRequestAttributes =
+                (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+
+        var authHeader = servletRequestAttributes.getRequest().getHeader("Authorization");
+        String token = null;
+
+        if(StringUtils.hasText(authHeader) && authHeader.startsWith("Bearer ")) {
+            token = authHeader.substring(7);
+
+        } else {
+            throw  new AppException(ErrorCode.UNAUTHENTICATED);
         }
-        return stringJoiner.toString();
+
+        return token;
+
     }
+
+    private String convert(String name) {
+        String normalized = Normalizer.normalize(name, Normalizer.Form.NFD);
+        String noDiacritics = Pattern.compile("\\p{InCombiningDiacriticalMarks}+").matcher(normalized).replaceAll("");
+        String username = noDiacritics.replaceAll("[^a-zA-Z0-9]", "_").toLowerCase();
+        username = username.replaceAll("_+", "_").replaceAll("^_|_$", "");
+        return username;
+    }
+
 }

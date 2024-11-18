@@ -9,6 +9,8 @@ services:
     environment:
       - SPRING_APPLICATION_NAME=api-gateway
       - APP_SERVICES_IDENTITY=http://identity:8080/identity
+      - APP_API_PREFIX=/api/v1
+      - APP_HOST_NAME=localhost
       - SPRING_CLOUD_GATEWAY_ROUTES[0]_ID=identity_service
       - SPRING_CLOUD_GATEWAY_ROUTES[0]_URI=http://identity:8080
       - SPRING_CLOUD_GATEWAY_ROUTES[0]_PREDICATES[0]=Path=/api/v1/identity/**

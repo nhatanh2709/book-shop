@@ -1,36 +1,42 @@
 package com.example.identity_service.service;
 
-import java.util.HashSet;
-import java.util.List;
-
 import com.example.event.dto.NotificationEvent;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.security.access.prepost.PostAuthorize;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
+import java.util.List;
 
-import com.example.identity_service.constant.PredefinedRole;
-import com.example.identity_service.dto.request.UserCreationRequest;
-import com.example.identity_service.dto.request.UserUpdateRequest;
-import com.example.identity_service.dto.response.UserResponse;
-import com.example.identity_service.entiy.Role;
-import com.example.identity_service.entiy.User;
+import com.example.identity_service.dto.request.ProfileCreationRequest;
+import com.example.identity_service.entity.User;
 import com.example.identity_service.exception.AppException;
 import com.example.identity_service.exception.ErrorCode;
 import com.example.identity_service.mapper.ProfileMapper;
-import com.example.identity_service.mapper.UserMapper;
-import com.example.identity_service.repository.RoleRepository;
-import com.example.identity_service.repository.UserRepostitory;
 import com.example.identity_service.repository.httpClient.ProfileClient;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
 
+import com.example.identity_service.dto.identity.Credential;
+import com.example.identity_service.dto.request.ClientExchangeTokenRequest;
+import com.example.identity_service.dto.identity.UserCreationParam;
+import com.example.identity_service.dto.request.UserCreationRequest;
+import com.example.identity_service.dto.response.UserResponse;
+import com.example.identity_service.exception.ErrorNormalizer;
+import com.example.identity_service.mapper.UserMapper;
+import com.example.identity_service.repository.httpClient.IdentityClient;
+import com.example.identity_service.repository.UserRepository;
+
+import feign.FeignException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StringUtils;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 @Service
 @Slf4j
@@ -38,88 +44,126 @@ import lombok.extern.slf4j.Slf4j;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserService {
 
-    UserRepostitory userRepostitory;
+    IdentityClient identityClient;
+    ErrorNormalizer errorNormalizer;
+    UserRepository userRepository;
     UserMapper userMapper;
-    PasswordEncoder passwordEncoder;
-    RoleRepository roleRepository;
     ProfileClient profileClient;
     ProfileMapper profileMapper;
-    KafkaTemplate<String, Object> kafkaTemplate;
+    KafkaTemplate<String , Object> kafkaTemplate;
+    @Value("${idp.client-id}")
+    @NonFinal
+    String clientId;
 
-    public UserResponse createUser(UserCreationRequest request) {
-        if (userRepostitory.existsByUsername(request.getUsername())) {
-            throw new AppException(ErrorCode.USER_EXISTED);
+    @Value("${idp.client-secret}")
+    @NonFinal
+    String clientSecret;
+
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public List<UserResponse> getUsers() {
+        return userRepository.findAll().stream().map(userMapper::toUserResponse).toList();
+    }
+
+    public UserResponse register(UserCreationRequest request) {
+        try {
+            if(userRepository.existsByUsername(request.getUsername())) {
+                throw new AppException(ErrorCode.USERNAME_EXSITED);
+            }
+            if(userRepository.existsByEmail(request.getEmail())) {
+                throw new AppException(ErrorCode.EMAIL_EXISTED);
+            }
+
+            var token = identityClient.exchangeToken(ClientExchangeTokenRequest.builder()
+                    .grant_type("client_credentials")
+                    .client_id(clientId)
+                    .client_secret(clientSecret)
+                    .scope("openid")
+                    .build());
+
+            var creationResponse = identityClient.createUser(
+                    "Bearer " + token.getAccessToken(),
+                    UserCreationParam.builder()
+                            .username(request.getUsername())
+                            .email(request.getEmail())
+                            .firstName(request.getUsername())
+                            .lastName(request.getUsername())
+                            .enabled(true)
+                            .emailVerified(false)
+                            .credentials(List.of(Credential.builder()
+                                    .type("password")
+                                    .temporary(false)
+                                    .value(request.getPassword())
+                                    .build()))
+                            .build());
+
+            String userId = extractUserId(creationResponse);
+            var newUsers = userMapper.toUser(request);
+            newUsers.setUserId(userId);
+            var user = userRepository.save(newUsers);
+
+            ProfileCreationRequest profileCreationRequest = profileMapper.toProfileCreationRequest(request);
+            profileCreationRequest.setUserId(user.getId());
+            var result = profileClient.createProfile(profileCreationRequest);
+
+            NotificationEvent notificationEvent = NotificationEvent.builder()
+                    .channel("EMAIL")
+                    .recipient(request.getEmail())
+                    .subject(request.getUsername())
+                    .build();
+
+            kafkaTemplate.send("notification-delivery", notificationEvent);
+
+            return userMapper.toUserResponse(user);
+        } catch (FeignException exception) {
+            throw errorNormalizer.handleKeyCloakException(exception);
         }
-        if (userRepostitory.existsByEmail(request.getEmail())) {
-            throw new AppException(ErrorCode.EMAIL_EXISTED);
-        }
-        User user = userMapper.toUser(request);
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-
-        HashSet<Role> roles = new HashSet<>();
-        Role userRole = roleRepository
-                .findById(PredefinedRole.USER_ROLE)
-                .orElseThrow(() -> new AppException(ErrorCode.INVALID_ROLE));
-        roles.add(userRole);
-        user.setRoles(roles);
-        user = userRepostitory.save(user);
-        var profileRequest = profileMapper.toProfileCreationrequest(request);
-        profileRequest.setUserId(user.getId());
-        ServletRequestAttributes servletRequestAttributes =
-                (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        var authHeader = servletRequestAttributes.getRequest().getHeader("Authorization");
-        profileClient.createProfile(profileRequest);
-
-        NotificationEvent notificationEvent = NotificationEvent.builder()
-                .channel("EMAIL")
-                .recipient(request.getEmail())
-                .subject(request.getUsername())
-                .build();
-
-        log.info("Kafka Send Message: {}", notificationEvent);
-        kafkaTemplate.send("notification-delivery", notificationEvent);
-
-        return userMapper.toUserReponse(user);
     }
 
     public UserResponse getMyInfo() {
-        var context = SecurityContextHolder.getContext();
-        String username = context.getAuthentication().getName();
-        User user = userRepostitory
-                .findByUsername(username)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-        return userMapper.toUserReponse(user);
-    }
-
-    @PreAuthorize("hasRole('ADMIN')")
-    // @PreAuthorize("hasAuthority('APPROVE_POST')")
-    public List<UserResponse> getUsers() {
-        return userRepostitory.findAll().stream().map(userMapper::toUserReponse).toList();
-    }
-
-    @PostAuthorize("returnObject.username == authentication.name")
-    public UserResponse getUser(String id) {
-        return userMapper.toUserReponse(
-                userRepostitory.findById(id).orElseThrow(() -> new RuntimeException("User not found")));
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userId = authentication.getName();
+        var user = userRepository.findByUserId(userId).orElseThrow(() ->
+                new AppException(ErrorCode.USER_NOT_EXISTED));
+        return userMapper.toUserResponse(user);
     }
 
 
-    public UserResponse updateUser(UserUpdateRequest request) {
-        String username = request.getUsername();
-        User user = userRepostitory.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
+    @PostAuthorize("returnObject.userId == authentication.name")
+    public UserResponse getUser(String userId) {
 
-        userMapper.updateUser(user, request);
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        return userMapper.toUserResponse(
+                userRepository.findByUserId(userId)
+                        .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED)));
+    }
 
-        if (request.getRoles() != null) {
-            var roles = roleRepository.findAllById(request.getRoles());
-            user.setRoles(new HashSet<>(roles));
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public void deleteUser(String id) {
+        User user = userRepository.findById(id).orElseThrow(() ->
+                new AppException(ErrorCode.USER_NOT_EXISTED)
+                );
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        ServletRequestAttributes servletRequestAttributes =
+                (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+
+        var authHeader = servletRequestAttributes.getRequest().getHeader("Authorization");
+        String token = null;
+
+        if(StringUtils.hasText(authHeader)) {
+            token = authHeader;
         }
-
-        return userMapper.toUserReponse(userRepostitory.save(user));
+        String userId = user.getUserId();
+        identityClient.deleteUser(token, userId);
+        userRepository.deleteById(userId);
     }
 
-    public void deleteUser(String userId) {
-        userRepostitory.deleteById(userId);
+
+    private String extractUserId(ResponseEntity<?> response) {
+        String location = response.getHeaders().get("Location").getFirst();
+        String[] splitedStr = location.split("/");
+        return splitedStr[splitedStr.length - 1];
     }
+
+
+
 }

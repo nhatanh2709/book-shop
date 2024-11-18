@@ -1,10 +1,10 @@
 package com.example.identity_service.dto.request;
 
-import java.time.LocalDate;
-
 import jakarta.annotation.Nullable;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+
+import java.time.LocalDate;
 
 @Data
 @NoArgsConstructor
@@ -13,8 +13,13 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProfileCreationRequest {
     String userId;
+
+    @Nullable
     String firstName;
+
+    @Nullable
     String email;
+
     @Nullable
     String lastName;
 
@@ -26,4 +31,5 @@ public class ProfileCreationRequest {
 
     @Nullable
     String profilePic;
+
 }

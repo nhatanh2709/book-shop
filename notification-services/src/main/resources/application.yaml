@@ -18,7 +18,12 @@ spring:
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
         spring.json.trusted.packages: "*"
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8180/realms/movie-web
 
 notification:
   email:
-    brevo-apikey: "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"
+    brevo-apikey: "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"

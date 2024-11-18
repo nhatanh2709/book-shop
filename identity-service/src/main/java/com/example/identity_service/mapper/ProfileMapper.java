@@ -1,11 +1,10 @@
 package com.example.identity_service.mapper;
 
-import org.mapstruct.Mapper;
-
 import com.example.identity_service.dto.request.ProfileCreationRequest;
 import com.example.identity_service.dto.request.UserCreationRequest;
+import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface ProfileMapper {
-    ProfileCreationRequest toProfileCreationrequest(UserCreationRequest request);
+    ProfileCreationRequest toProfileCreationRequest(UserCreationRequest request);
 }

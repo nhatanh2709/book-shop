@@ -4,7 +4,7 @@ package com.example.api_gateway.service;
 import com.example.api_gateway.dto.ApiResponse;
 import com.example.api_gateway.dto.request.IntroSpectRequest;
 import com.example.api_gateway.dto.response.IntrospectResponse;
-import com.example.api_gateway.repository.IdentityClient;
+import com.example.api_gateway.repository.httpClient.IdentityClient;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
