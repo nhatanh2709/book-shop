@@ -85,11 +85,15 @@ public class AuthenticationService {
     protected final String GRANT_TYPE = "authorization_code";
 
     public AuthenticationResponse outboundAuthenticate(String code) throws JOSEException, ParseException {
+        log.info("code: {}", code);
+        log.info("ClientId: {}", CLIENT_ID);
+        log.info("ClientSecret: {}", CLIENT_SECRET);
+        log.info("RedirectedUri: {}", REDIRECT_URI);
         var response = outboundIdentityClient.exchangeToken(ExchangeTokenRequest.builder()
                         .code(code)
                         .clientId(CLIENT_ID)
                         .clientSecret(CLIENT_SECRET)
-                        .grantType(GRANT_TYPE)
+                        .grantType("authorization_code")
                         .redirectUri(REDIRECT_URI)
                         .build());
         var userInfo = outboundUserClient.getUserInfo("json", response.getAccessToken());

@@ -45,6 +45,6 @@ keycloak:
 
 
 google:
-  clientId: "309829967812-k45di4ubndsbv94fft0cjhabgcikca1o.apps.googleusercontent.com"
-  clientSecret: "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"
-  redirectUri: "http://localhost:3000/authenticate"
+  clientId: "158851926370-0impqju5lds1pk3d7dlj046e5eik1fr4.apps.googleusercontent.com"
+  clientSecret: "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"
+  redirectUri: "https://nhatanh.movie-app-motphim.com/authenticate"
