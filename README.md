@@ -2,7 +2,8 @@
 
 ## 1. Tổng quan
 ### Architecture 
-[![](https://i.ibb.co/5cSdgt9/Untitled.png)](https://ibb.co/9Y1Jkzv)
+![](https://i.imgur.com/pzmRvN5.png)
+
 
 #### **Frontend**: ReactJS
 #### **Backend**: Java Spring Boot
@@ -67,7 +68,8 @@
 
 ### DevSecOps Pipeline: 
 Mô hình : 
-[![](https://i.ibb.co/TbsdRRH/Untitled.png)](https://ibb.co/xfNdGGM)
+![](https://i.imgur.com/7RyTwx0.png)
+
 
 
 - Ứng dụng trước khi được triển khai thực tế sẽ phải qua quy trình kiểm thử như sau
