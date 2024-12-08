@@ -9,6 +9,5 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class PaymentClientRequest {
-    String userId;
     String packageId;
 }

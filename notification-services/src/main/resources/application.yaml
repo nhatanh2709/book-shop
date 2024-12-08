@@ -26,4 +26,4 @@ spring:
 
 notification:
   email:
-    brevo-apikey: "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"
+    brevo-apikey: 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

@@ -8,6 +8,6 @@ services:
       - "7474:7474"
       - "7687:7687"
     environment:
-      NEO4J_AUTH: neo4j/anhproqn999ABC@
+      NEO4J_AUTH: neo4j/123456789
     volumes:
       - ./neo4j_data:/data

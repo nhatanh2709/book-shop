@@ -38,7 +38,7 @@ function App() {
         <Route path='/:category/search/:keyword' element={<Catalog />} />
         <Route path='/:category/:type' element={<Catalog />} />
         <Route path='/:category' element={<Catalog />} />
-        
+        <Route path='/buyPackage' element={<BuyPackage/>}/>
         <Route path="/profile" element={<Profile/>}/>
       
 

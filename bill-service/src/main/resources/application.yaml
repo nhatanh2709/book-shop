@@ -9,13 +9,25 @@ spring:
     mongodb:
       uri: mongodb+srv://anh:27092004@backenddb.2qdkr.mongodb.net/?retryWrites=true&w=majority&appName=BackendDB
       database: movie-web
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://keycloak.website/realms/movie-web
 
 app:
   services:
     identity: http://localhost:8080/identity
+    profile: http://localhost:8081/profile
   id: "2554"
   key1: "sdngKKJmqEMzvh5QQcdD2A9XBSKUNaYn"
   key2: "trMrHtvjo6myautxDUiAcYsVtaeQ8nhf"
   endpoint: "https://sb-openapi.zalopay.vn/v2"
   redirectedUrl: http://localhost:8085
   callbackUrl: http://localhost:8085
+
+momo:
+  accessKey: F8BBA842ECF85
+  secretKey: K951B6PE1waDMi640xX08PD3vg6EkVlz
+  ipnUrl: https://0ca8-125-235-232-177.ngrok-free.app/api/v1/bills/callback
+  redirectUrl: https://google.com

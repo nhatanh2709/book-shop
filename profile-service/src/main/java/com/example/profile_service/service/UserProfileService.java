@@ -31,8 +31,8 @@ public class UserProfileService {
 
     public UserProfileResponse createProfile(ProfileCreationRequest request) {
         UserProfile userProfile = userProfileMapper.toUserProfile(request);
-
         userProfile = userProfileRepository.save(userProfile);
+        log.info("userProfile Response: {}", userProfile);
         return userProfileMapper.toUserProfileReponse(userProfile);
     }
 
@@ -76,5 +76,13 @@ public class UserProfileService {
     public List<UserProfileResponse> getAllProfiles() {
         var profiles = userProfileRepository.findAll();
         return profiles.stream().map(userProfileMapper::toUserProfileReponse).toList();
+    }
+
+    public UserProfileResponse updateTransactions(String email) {
+        UserProfile userProfile = userProfileRepository.findByEmail(email).orElseThrow(() ->
+                new AppException(ErrorCode.EMAIL_NOT_EXISTED)
+                );
+        userProfile.setIsBuyPackage(true);
+        return userProfileMapper.toUserProfileReponse(userProfileRepository.save(userProfile));
     }
 }

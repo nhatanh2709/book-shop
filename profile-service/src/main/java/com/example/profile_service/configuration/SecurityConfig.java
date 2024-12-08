@@ -17,7 +17,8 @@ import org.springframework.security.web.SecurityFilterChain;
 @Slf4j
 public class SecurityConfig {
     private final String[] PUBLIC_ENDPOINTS = {
-            "/internal/users"
+            "/internal/users",
+            "/users/transactions"
     };
 
     @Bean

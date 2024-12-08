@@ -6,18 +6,29 @@ import { Link } from "react-router-dom";
 import { useNavigate } from 'react-router-dom'
 import "./register.scss";
 import Toastify from 'toastify-js';
+import ReCAPTCHA from "react-google-recaptcha";
 export default function Register() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [username, setUsername] = useState("");
+    const [recaptchaToken , setRecaptchaToken] = useState(null);
     const navigate = useNavigate();
+    const GOOGLE_CLIENT_KEY = process.env.REACT_APP_GOOGLE_CLIENT_KEY;
 
  
     const handleRegister = async (e) => {
         e.preventDefault();
-
+        
         try {
-            const response = await axios.post(`${process.env.REACT_APP_GATEWAY_URL}/api/v1/identity/users/registration`, { email, username, password });
+            const response = await axios.post(
+                `${process.env.REACT_APP_GATEWAY_URL}/api/v1/identity/users/registration`,
+                { email, username, password },
+                {
+                    headers: {
+                        "captcha-response": recaptchaToken,
+                    },
+                }
+            );
             Toastify({
                 text: "Register Successfully",
                 style: {
@@ -43,6 +54,10 @@ export default function Register() {
         
         
     };
+
+    const onCaptchaChange = (token) => {
+        setRecaptchaToken(token);
+    }
     return (
         <div className="login">
             <div className="body">
@@ -75,7 +90,7 @@ export default function Register() {
                             onChange={(e) => setPassword(e.target.value)} />
                             <FaLock className="icon" />
                         </div>
-
+                        
 
                         <div className="remember-forgot">
                             <label>
@@ -87,6 +102,12 @@ export default function Register() {
                                 </Link>
                             </a>
                         </div>
+                        <div className="recaptcha-container">
+                            <ReCAPTCHA
+                                sitekey={GOOGLE_CLIENT_KEY}
+                                onChange={onCaptchaChange}
+                            />
+                        </div>
                         <button type="submit" onClick={handleRegister}>
                             Register
                         </button>
@@ -95,15 +116,6 @@ export default function Register() {
                             <p>Have an account ?
                                 <a href="#">
                                     <Link to="/login">
-                                        Login
-                                    </Link>
-                                </a>
-                            </p>
-                        </div>
-                        <div className="register-link">
-                            <p>Continue with Google ?
-                                <a href="#">
-                                    <Link to="/loginAI">
                                         Login
                                     </Link>
                                 </a>

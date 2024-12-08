@@ -19,4 +19,5 @@ public class UserProfileResponse {
     LocalDate dob;
     String city;
     String profilePic;
+    Boolean isBuyPackage;
 }

@@ -9,12 +9,12 @@ const BuyPackage = () => {
   const [listPackage, setListPackage] = useState([]);
   useEffect(() => {
     const getPackage = async() => {
-      const res = await axios.get(`${process.env.REACT_APP_GATEWAY_URL}/service3/api/bills/getAll` , {
-          headers: {
-            token: "Bearer " + JSON.parse(localStorage.getItem("user")).accessToken
+      const res = await axios.get(`${process.env.REACT_APP_GATEWAY_URL}/api/v1/bills/getAll` ,{
+        headers: {
+            Authorization: "Bearer "+JSON.parse(localStorage.getItem("user")).token
           }
-        }
-      )
+    })
+      
       setListPackage(res.data.result);
     }
     getPackage();
@@ -24,9 +24,11 @@ const BuyPackage = () => {
     <>
       <Header/>
       <div className='gallery'>
+        
         {
           listPackage.map((item) => 
-            <PackageItem id={item._id}/>
+            
+            <PackageItem id={item.id}/>
           )
         }
       </div>

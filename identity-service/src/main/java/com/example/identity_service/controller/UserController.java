@@ -2,6 +2,7 @@ package com.example.identity_service.controller;
 
 import java.util.List;
 
+import com.example.identity_service.aspect.RequiresCaptcha;
 import com.example.identity_service.entity.User;
 import jakarta.validation.Valid;
 
@@ -27,6 +28,7 @@ public class UserController {
     UserService userService;
 
     @PostMapping("/registration")
+    @RequiresCaptcha
     ApiResponse<UserResponse> register(@RequestBody @Valid UserCreationRequest request) {
         log.info("User Creation Request: {}", request);
         return ApiResponse.<UserResponse>builder()

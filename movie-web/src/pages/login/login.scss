@@ -119,6 +119,17 @@
     
 }
 
+.recaptcha-container {
+    display: flex;
+    justify-content: center;
+    width: 80%; /* Set width to 80% of the wrapper */
+    margin: 15px auto; /* Center horizontally and add spacing */
+    
+    .g-recaptcha {
+        transform: scale(0.85); /* Adjust scale if needed */
+        transform-origin: center;
+    }
+}
 
 
 code {

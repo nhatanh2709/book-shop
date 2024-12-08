@@ -20,7 +20,9 @@ public enum ErrorCode {
     INVALID_ROLE(1009, "This role invalid", HttpStatus.FORBIDDEN),
     FIND_MOVIE_BY_SLUG_FAILED(1010, "Find Movie By Slug Failed", HttpStatus.BAD_REQUEST),
     FIND_MOVIE_BY_ID_FAILED(1011, "Find Movie By Id Failed", HttpStatus.BAD_REQUEST),
-    FIND_BILL_BY_ID_FAILED(1012, "Find Bill By Id Failed", HttpStatus.BAD_REQUEST);
+    FIND_BILL_BY_ID_FAILED(1012, "Find Bill By Id Failed", HttpStatus.BAD_REQUEST),
+    CREATE_TRANSACTIONS_FAILED(1013, "Create Transactions Failed", HttpStatus.BAD_REQUEST),
+    BILL_NOT_FOUND(1014, "Cannot found Bill Package", HttpStatus.BAD_REQUEST);
 
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

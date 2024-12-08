@@ -12,12 +12,12 @@ const PackageItem = props => {
     const navigate = useNavigate();
     useEffect(() => {
         const getPackage = async () => {
-            const res = await axios.get(`${process.env.REACT_APP_GATEWAY_URL}/service3/api/bills/getPackage/${props.id}`, {
+            const res = await axios.get(`${process.env.REACT_APP_GATEWAY_URL}/api/v1/bills/get/${props.id}`,{
                 headers: {
-                    token: "Bearer " + JSON.parse(localStorage.getItem("user")).accessToken
-                }
-            }
-            )
+                    Authorization: "Bearer "+JSON.parse(localStorage.getItem("user")).token
+                  }
+            });
+            console.log(res.data.result);
             setPackage(res.data.result);
         }
         if (props.id !== undefined) {
@@ -27,19 +27,19 @@ const PackageItem = props => {
 
     useEffect(() => {
         const getInfoTransfer = async() => {
-            const res = await axios.post(`${process.env.REACT_APP_GATEWAY_URL}/service3/api/bills/payment`, {
-                    email: user.email,
-                    PackageID: Package._id
+            const res = await axios.post(`${process.env.REACT_APP_GATEWAY_URL}/api/v1/bills/transactions`, {
+                    packageId: Package.id
                 }, {
                     headers: {
-                        token: "Bearer " + JSON.parse(localStorage.getItem("user")).accessToken
-                    }
-                }
-            )   
+                        Authorization: "Bearer "+JSON.parse(localStorage.getItem("user")).token
+                      }
+                })
+            
             setInfoTransfer(res.data.result);
-            setUrl(res.data.result.order_url);
+            setUrl(res.data.result.payUrl);
+            console.log(url);
         }
-        if(Package !== undefined && Package._id !== undefined) {
+        if(Package !== undefined && Package.id !== undefined) {
             getInfoTransfer();
         }
     },[Package])

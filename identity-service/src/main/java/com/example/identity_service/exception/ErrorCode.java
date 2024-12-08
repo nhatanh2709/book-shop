@@ -21,7 +21,9 @@ public enum ErrorCode {
     PASSWORD_INVALID(1013, "Password must be at least 4 characters", HttpStatus.BAD_REQUEST),
     INVALID_DOB(1014, "Your age must be at least {min}", HttpStatus.BAD_REQUEST),
     LOGIN_FAILED(1015, "Username or password is wrong", HttpStatus.BAD_REQUEST),
-    EMAIL_NOT_EXISTED(1016, "This email not existed", HttpStatus.BAD_REQUEST);
+    EMAIL_NOT_EXISTED(1016, "This email not existed", HttpStatus.BAD_REQUEST),
+    GOOGLE_CAPTCHA_INVALID(1017, "Captcha is not valid", HttpStatus.FORBIDDEN),
+    EMAIL_NOT_VERIFIED(1018, "Email not verified please verify this", HttpStatus.BAD_REQUEST);
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
         this.code = code;

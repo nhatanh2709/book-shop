@@ -130,34 +130,7 @@ const Profile = () => {
       return { ...prev, lastName: lastName };
     })
 
-    if(newPass !== null && String(newPass).length >= 4) {
-      console.log(newPass);
-      if(newPass !== confirmPass) {
-        Toastify({
-          text: 'Mật khẩu nhập lại không đúng mời nhập lại',
-          style: {
-            background: "linear-gradient(to right, #00b09b, #96c93d)",
-            display : "flex",
-            justifyContent: "center",  // Căn giữa theo chiều ngang
-            alignItems: "center",
-          },        
-        }).showToast();
-        return ;
-      }
-      setInfo((prev) => {
-        return { ...prev, password: newPass };
-      })
-    } else {
-      Toastify({
-        text: 'Mật khẩu ít nhất 4 kí tự',
-        style: {
-          background: "linear-gradient(to right, #00b09b, #96c93d)",
-          display : "flex",
-          justifyContent: "center",  // Căn giữa theo chiều ngang
-          alignItems: "center",
-        },        
-      }).showToast();
-    }
+    
     
     if(profilePic !== null) {
       upload([

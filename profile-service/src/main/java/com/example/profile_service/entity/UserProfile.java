@@ -31,4 +31,6 @@ public class UserProfile {
     LocalDate dob;
     String city;
     String profilePic = "https://i.ibb.co/SVDVMW3/user-profile-icon-free-vector.jpg";
+
+    Boolean isBuyPackage = false;
 }

@@ -2,6 +2,7 @@ package com.example.profile_service.controller;
 
 import com.example.profile_service.dto.ApiResponse;
 import com.example.profile_service.dto.request.ProfileCreationRequest;
+import com.example.profile_service.dto.request.ProfileUpdateRequest;
 import com.example.profile_service.dto.response.UserProfileResponse;
 import com.example.profile_service.service.UserProfileService;
 import lombok.AccessLevel;
@@ -20,7 +21,6 @@ public class InternalUserProfileController {
 
     @PostMapping("/users")
     ApiResponse<UserProfileResponse> createProfile(@RequestBody ProfileCreationRequest request) {
-        log.info("11111");
         return ApiResponse.<UserProfileResponse>builder()
                 .result(userProfileService.createProfile(request))
                 .build();

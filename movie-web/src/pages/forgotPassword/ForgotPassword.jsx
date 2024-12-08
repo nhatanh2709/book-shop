@@ -6,11 +6,13 @@ import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import "./forgotPassword.scss";
 import Toastify from 'toastify-js';
+import ReCAPTCHA from 'react-google-recaptcha';
 const ForgotPassword = () => {
 
     const [email, setEmail] = useState("");
     const navigate = useNavigate();
-
+    const [recaptchaToken, setRecaptchaToken] = useState(null);
+    const GOOGLE_CLIENT_KEY = process.env.REACT_APP_GOOGLE_CLIENT_KEY;
 
     const handleForgotPassWord = async(e) => {
         e.preventDefault();
@@ -40,6 +42,9 @@ const ForgotPassword = () => {
         }
         
     }
+    const onCaptchaChange = (token) => {
+        setRecaptchaToken(token);
+    }
   return (
     <div className="login">
             <div className="body">
@@ -67,7 +72,12 @@ const ForgotPassword = () => {
                         <button type="submit" onClick={handleForgotPassWord}>
                             Resert Password
                         </button>
-
+                        <div className="recaptcha-container">
+                            <ReCAPTCHA
+                                sitekey={GOOGLE_CLIENT_KEY}
+                                onChange={onCaptchaChange}
+                            />
+                        </div>
                         <div className="register-link">
                             <p>Have an account ?
                                 <a href="#">

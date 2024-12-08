@@ -59,6 +59,26 @@ const Detail = () => {
     }
   }, [id]);
 
+  useEffect(() => {
+    const getWatch = async () => {
+      try {
+        const res = await axios.get(
+          `${process.env.REACT_APP_GATEWAY_URL}/api/v1/profile/users/myProfile`,{
+            headers: {
+                Authorization: "Bearer "+JSON.parse(localStorage.getItem("user")).token
+              }
+        })
+        setIsWatch(res.data.result.isBuyPackage);
+        console.log(res.data.result);
+      } catch(err) {
+        console.log(err);
+      }
+    }
+    if(user!== undefined && id !== undefined ) {
+      getWatch();
+    }
+  },[user, id]) 
+
 
   useEffect(() => {
     
@@ -110,9 +130,20 @@ const Detail = () => {
 
               </div>
               <div className='section mb-3'>
-                <>
-                <Video link={movie?.video} name={"Video"} />
-                </>
+                {
+                    isWatch=== true && <Video link={movie?.video} name={"Video"} />
+                  } 
+                  {
+                    isWatch === false && 
+                    <>
+                      <h1 className='overview'>
+                        To access this movie You must buy a  
+                        <Link to={'/buyPackage'} className='highlight'>
+                          Package
+                        </Link>
+                      </h1>
+                    </>
+                }
                 {
                   comment.length !== 0 && (
                     <h2>New Comment</h2>

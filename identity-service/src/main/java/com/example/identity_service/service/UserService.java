@@ -1,6 +1,7 @@
 package com.example.identity_service.service;
 
 import com.example.event.dto.NotificationEvent;
+import com.example.identity_service.service.keycloak.KeyCloakService;
 import org.springframework.kafka.core.KafkaTemplate;
 import java.util.List;
 
@@ -51,6 +52,7 @@ public class UserService {
     ProfileClient profileClient;
     ProfileMapper profileMapper;
     KafkaTemplate<String , Object> kafkaTemplate;
+    KeyCloakService keyCloakService;
     @Value("${idp.client-id}")
     @NonFinal
     String clientId;
@@ -111,6 +113,7 @@ public class UserService {
                     .recipient(request.getEmail())
                     .subject(request.getUsername())
                     .build();
+            keyCloakService.emailVerification(newUsers.getUserId());
 
             kafkaTemplate.send("notification-delivery", notificationEvent);
 

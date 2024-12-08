@@ -3,7 +3,7 @@ version: '3.8'
 services:
   api-gateway:
     container_name: api-gateway
-    image: slayder2709/api-gateway:v4
+    image: slayder2709/api-gateway:v8
     ports:
       - "8888:8888"
     environment:
@@ -31,13 +31,17 @@ services:
       - SPRING_CLOUD_GATEWAY_ROUTES[4]_URI=http://search:8084
       - SPRING_CLOUD_GATEWAY_ROUTES[4]_PREDICATES[0]=Path=/api/v1/search/**
       - SPRING_CLOUD_GATEWAY_ROUTES[4]_FILTERS[0]=StripPrefix=2
+      - SPRING_CLOUD_GATEWAY_ROUTES[5]_ID=bills_service
+      - SPRING_CLOUD_GATEWAY_ROUTES[5]_URI=http://bills:8085
+      - SPRING_CLOUD_GATEWAY_ROUTES[5]_PREDICATES[0]=Path=/api/v1/bills/**
+      - SPRING_CLOUD_GATEWAY_ROUTES[5]_FILTERS[0]=StripPrefix=2
     networks:
       - movie-web
     depends_on:
       - identity
   identity:
     container_name: identity_service
-    image: slayder2709/identity-service:v4
+    image: slayder2709/identity-service:v8
     ports:
       - "8080:8080"
     environment:
@@ -65,16 +69,17 @@ services:
       - JWT_VALID_DURATION=360000
       - JWT_REFRESHABLE_DURATION=864000
       - APP_SERVICES_PROFILE=http://profile:8081/profile
-      - GOOGLE_CLIENT_ID=309829967812-k45di4ubndsbv94fft0cjhabgcikca1o.apps.googleusercontent.com
-      - GOOGLE_CLIENT_SECRET=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
+      - GOOGLE_CLIENT_ID=762822258511-fleddar4d17s9a6gm7e21u2d6hshrqo3.apps.googleusercontent.com
+      - GOOGLE_CLIENT_SECRET=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
       - GOOGLE_REDIRECT_URI=http://localhost:3000/authenticate
+      - GOOGLE_RECAPTCHA_SECRET=6Lc_35QqAAAAAC-L4OcklrnoHE9lUK7iG6v8Lg8H
     networks:
       - movie-web
     depends_on:
       - mysql
   profile:
     container_name: profile_service
-    image: slayder2709/profile-service:v4
+    image: slayder2709/profile-service:v8
     ports:
       - "8081:8081"
     environment:
@@ -115,7 +120,7 @@ services:
     networks:
       - movie-web
   movie:
-    image: slayder2709/movie-service:v4
+    image: slayder2709/movie-service:v8
     container_name: movie-service
     ports:
       - "8083:8083"
@@ -130,7 +135,7 @@ services:
     networks:
       - movie-web
   search:
-    image: slayder2709/search-service:v4
+    image: slayder2709/search-service:v8
     container_name: search-service
     ports:
       - "8084:8084"
@@ -141,6 +146,32 @@ services:
       - SPRING_APPLICATION_NAME=search-service
       - SPRING_ELASTICSEARCH_URIS=http://elasticsearch:9200
       - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=https://keycloak.website/realms/movie-web
+    networks:
+      - movie-web
+  bills:
+    image: slayder2709/bill-service:v8
+    container_name: bill-service
+    ports:
+      - "8085:8085"
+    environment:
+      - SERVER_PORT=8085
+      - SERVER_SERVLET_CONTEXT_PATH=/bills
+      - SPRING_APPLICATION_NAME=bill-service
+      - SPRING_DATA_MONGODB_URI=mongodb+srv://anh:27092004@backenddb.2qdkr.mongodb.net/?retryWrites=true&w=majority&appName=BackendDB
+      - SPRING_DATA_MONGODB_DATABASE=movie-web
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=https://keycloak.website/realms/movie-web
+      - APP_SERVICES_IDENTITY=http://identity:8080/identity
+      - APP_SERVICES_PROFILE=http://profile:8081/profile
+      - APP_ID=2554
+      - APP_KEY1=sdngKKJmqEMzvh5QQcdD2A9XBSKUNaYn
+      - APP_KEY2=trMrHtvjo6myautxDUiAcYsVtaeQ8nhf
+      - APP_ENDPOINT=https://sb-openapi.zalopay.vn/v2
+      - APP_REDIRECTED_URL=http://bills:8085
+      - APP_CALLBACK_URL=http://bills:8085
+      - MOMO_ACCESS_KEY=F8BBA842ECF85
+      - MOMO_SECRET_KEY=K951B6PE1waDMi640xX08PD3vg6EkVlz
+      - MOMO_IPN_URL=https://0ca8-125-235-232-177.ngrok-free.app/api/v1/bills/callback
+      - MOMO_REDIRECT_URL=https://google.com
     networks:
       - movie-web
   mysql:

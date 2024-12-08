@@ -23,6 +23,7 @@ import com.example.identity_service.service.keycloak.KeyCloakService;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jwt.SignedJWT;
 import feign.FeignException;
+import org.keycloak.representations.idm.UserRepresentation;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -101,6 +102,7 @@ public class AuthenticationService {
 
         boolean isRegister = false;
         if(userRepository.existsByEmail(userInfo.getEmail())) {
+            log.info("IsRegister: {}", isRegister);
             isRegister = true;
         }
         log.info("isRegister: {}", isRegister);
@@ -116,7 +118,7 @@ public class AuthenticationService {
             var creationResponse = identityClient.createUser(
                     "Bearer " + token.getAccessToken(),
                     UserCreationParam.builder()
-                            .username(convert(userInfo.getName()))
+                            .username(userInfo.getEmail())
                             .email(userInfo.getEmail())
                             .firstName(userInfo.getGivenName())
                             .lastName(userInfo.getFamilyName())
@@ -130,7 +132,7 @@ public class AuthenticationService {
                             .build());
             userId = extractUserId(creationResponse);
             userRepository.save(User.builder()
-                    .username(convert(userInfo.getName()))
+                    .username(userInfo.getEmail())
                     .email(userInfo.getEmail())
                     .userId(userId)
                     .build());
@@ -139,14 +141,14 @@ public class AuthenticationService {
         User user = userRepository.findByEmail(userInfo.getEmail()).orElseThrow(() ->
                 new AppException(ErrorCode.EMAIL_NOT_EXISTED)
                 );
-        log.info("User: {}", user);
+        UserRepresentation info = keyCloakService.getUserById(user.getUserId());
 
         UserExchangeTokenRequest TokenRequest = UserExchangeTokenRequest.builder()
                 .client_id(clientId)
                 .client_secret(clientSecret)
                 .grant_type("password")
                 .scope("openid")
-                .username(user.getUsername())
+                .username(info.getUsername())
                 .password("1")
                 .build();
 
@@ -244,6 +246,11 @@ public class AuthenticationService {
         try {
             User user = userRepository.findByUsername(request.getUsername())
                     .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+            String userId = user.getUserId();
+            UserRepresentation userRepresentation = keyCloakService.getUserById(userId);
+            if(!userRepresentation.isEmailVerified()) {
+                throw new AppException(ErrorCode.EMAIL_NOT_VERIFIED);
+            }
             UserExchangeTokenRequest TokenRequest = UserExchangeTokenRequest.builder()
                     .client_id(clientId)
                     .client_secret(clientSecret)

@@ -1,5 +1,6 @@
 package com.example.identity_service.controller;
 
+import com.example.identity_service.aspect.RequiresCaptcha;
 import com.example.identity_service.dto.ApiResponse;
 import com.example.identity_service.dto.request.*;
 import com.example.identity_service.dto.response.AuthenticationResponse;
@@ -25,11 +26,14 @@ public class AuthenticationController {
     AuthenticationService authenticationService;
 
     @PostMapping("/token")
+    @RequiresCaptcha
     ApiResponse<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request)
             throws JOSEException, ParseException  {
         var result = authenticationService.authenticate(request);
         return ApiResponse.<AuthenticationResponse>builder().result(result).build();
     }
+
+
 
     @PostMapping("/introspect")
     ApiResponse<IntrospectResponse> introspect(@RequestBody IntrospectRequest request)
@@ -65,6 +69,7 @@ public class AuthenticationController {
     @PostMapping("/outbound/authentication")
     ApiResponse<AuthenticationResponse> outboundAuthenticate(@RequestParam("code") String code)
             throws JOSEException, ParseException {
+        log.info("Code: {}", code);
         return ApiResponse.<AuthenticationResponse>builder()
                 .result(authenticationService.outboundAuthenticate(code))
                 .build();
