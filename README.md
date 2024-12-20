@@ -2,7 +2,7 @@
 
 ## 1. Tổng quan
 ### Architecture 
-![](https://i.imgur.com/pzmRvN5.png)
+![](https://imgur.com/PJmtUjI.png)
 
 
 #### **Frontend**: ReactJS
@@ -27,13 +27,19 @@
 #### Metadata:  Firebase Storage
 #### Web Server: Nginx
 #### Backup: AWS S3
-#### Cloud:  AWS
+#### Cloud Security Application: 
+- **Provider**: AWS
+- **Firewall**: AWS WAFs
+- **CDN**: Cloudfront
+- **Monitoring** : CloudWatch
+- **Routing**: Route53
+- **Certificate** : AWS Certificate Management
 
 ## 2. Chi tiết dự án
 ### Mô hình triển khai :
 - Mô hình Micro Services với Docker Conatiner
 
-[![](https://i.ibb.co/10VTMBk/Screenshot-2024-12-03-162954.png)](https://ibb.co/kGnXJzt)
+![Description of the image](https://imgur.com/xWfyK8q.png)
 
 ### Chi tiết các Service:
 - Triển khai mô hình MVC cho từng service theo nguyên tắc Separation of Concerns
@@ -47,23 +53,29 @@
 
 
 ### KeyCloak:
-- Sử dụng như phương thức OpenID
-- Manage và Onboard toàn bộ user của hệ thống với những thông tin quan trọng mà chỉ mỗi KeyCloak được giữ (Password, CertBot)
+- Sử dụng như 1 Idp(Identity Provider)
+- Manage và Onboard toàn bộ user của hệ thống với những thông tin quan trọng mà chỉ mỗi KeyCloak được giữ (Password, Certificate)
 #### Hệ thống phân quyền gồm 2 phần: 
 - RBAC: Custom để quản lí Role Permissions của user với Application
 - PBAC: Mặc định của KeyCloak nhằm kiểm quyền truy cập dựa trên chinh sách của nó 
+#### Giao thức triển khai:
+- OpenID Connect: Triển khai theo mô hình Oauth2(Google) kết hợp Authentication 
 
 ### Các tính năng triển khai:
 - Login Register Basic (Username, Password)
-- Oauth2 với Google
-- Gửi nhận thông báo với Kafka
+- Login với dịch vụ bên thứ 3 như Google
+- Xác thực Captcha với Google Recaptcha
+- Thay đổi mật khẩu 
+- Gửi nhận thông báo với Kafka và Mail Service là Brevo 
 - Lựa chọn các list phim (Most Rating Most Movie)
 - Xem phim theo thể loại (Movie , TV Show)
 - Comment cho mỗi phim
 - Đánh Rating cho mỗi phim
-- Filter Search Movie để tìm phim thuận lợi
-- Chỉnh sửa profile cá nhân như (City, BirthDay, Image)
-- Tìm phim theo gợi ý
+- Filter Search Movie với tiêu đề
+- Quản lí chỉnh sửa profile cá nhân
+- Tìm phim theo Recommend Movie System
+- Thực hiện mua gói phim để xem được nhiều dịch vụ hơn với Momo Sandbox
+- Upload phim và hình ảnh với Storage Provider là Firebase
 
 
 ### DevSecOps Pipeline: 
@@ -95,7 +107,23 @@ grafana
 
 ### Backup:
 - Firebase Storage: Backup những metadata của application như video , ảnh movie , ảnh user
-- AWS S3: Backup những database nào triển khai cho ứng dụng dưới dạng docker container(elastic search , mysql , neo4j). Rieeng MongoDB được backup bởi MongoCloud
+- AWS S3: Backup những database nào triển khai cho ứng dụng dưới dạng docker container(Elastic Search , Mysql , Neo4j). Rieeng MongoDB được backup bởi MongoCloud
+
+### Cloud Security Application:
+![](https://imgur.com/zYk6EEK.png)
+- AWS WAFs: Là dịch vụ Web Application Firewall được enable để ngăn chặn:
+  - Anti DDos Layer 7
+  - Top 10 OSWAP**
+  - Traffic from Back-list , VPN
+  - Request from USA
+- Cloudfront : Là dịch vụ CDN làm giảm latency của traffic ở khắp mọi nơi và được kết hợp với AWS Shield là giải pháp Anti DDos layer 3, 4
+- CloudWatch : Là giải pháp Monitoring của Cloud giúp giám sát metrics tới WAF và CloudFront với các tùy chọn như : 
+  - Block Requests and Access Request
+  - IP of request
+  - Country of request
+  - Browser of request
+- Route53: Là dịch vụ routing nhằm handle traffic tới CloudFront và kết hợp với AWS Certificate Management làm certificate cho request 
+
 
 ### Link:
 - Project Github: https://github.com/nhatanh2709/movie-web-spring-boot
