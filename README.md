@@ -113,7 +113,7 @@ grafana
 ![](https://imgur.com/zYk6EEK.png)
 - AWS WAFs: Là dịch vụ Web Application Firewall được enable để ngăn chặn:
   - Anti DDos Layer 7
-  - Top 10 OSWAP**
+  - Top 10 OWSAP**
   - Traffic from Back-list , VPN
   - Request from USA
 - Cloudfront : Là dịch vụ CDN làm giảm latency của traffic ở khắp mọi nơi và được kết hợp với AWS Shield là giải pháp Anti DDos layer 3, 4
