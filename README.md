@@ -50,6 +50,7 @@
 - Notification Service: Manage và gửi các thông báo của hệ thống với message queue là Kafka và Mail Services là Brevo
 - Movie Service: Manage Movie, List Movie, Comment
 - Search Service: Filter Search cho ứng dụng với Elastic Search , Movie Data được đồng bộ hóa từ MongoDB sang với LogStash
+- Bill Service: Tiến hành mua dịch vụ xem phim với Momo Sandbox
 
 
 ### KeyCloak:
@@ -132,3 +133,4 @@ grafana
 - Prometheus : http://18.143.118.15:9090
 - Grafana Dashboard : http://18.143.118.15:3000
 - Keycloak Seft-Host: https://keycloak.website
+- Full Demo: https://drive.google.com/file/d/1xKcFz1WafgPD3TQAuEsLl4rBcqqbunrO/view?usp=drive_link
